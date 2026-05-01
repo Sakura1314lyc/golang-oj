@@ -1,145 +1,177 @@
-# Golang Online Judge (GOOJ)
+# GOOJ — Golang Online Judge
 
-一个基于 Go 和 React 的在线评测系统（Online Judge），支持代码提交、实时评测、排行榜等功能。
-
-## 项目简介
-
-GOOJ 是一个简易的在线编程评测平台，后端使用 Go 语言开发，前端使用 React + Vite 构建。系统支持多种编程语言的代码提交和评测，提供题目列表、提交状态查询、排行榜等功能。
-
-## 功能特性
-
-- **题目管理**: 支持题目列表展示、难度分级、标签分类
-- **代码提交**: 支持多种编程语言（C++、Java等）
-- **实时评测**: 提交后实时显示评测状态和结果
-- **排行榜**: 根据解题数量和评分显示用户排名
-- **用户系统**: 用户资料、提交统计
-- **比赛支持**: 比赛列表和题目集
+一个基于 Go + React 的在线评测系统，支持多语言代码提交、真实编译判题、用户认证、排行榜和比赛管理。
 
 ## 技术栈
 
-### 后端
-- **Go 1.26.1**
-- **Gin**: Web 框架
-- **GORM**: ORM 框架
-- **MySQL**: 数据库
-- **CORS**: 跨域支持
+| 层级 | 技术 | 说明 |
+|------|------|------|
+| **后端** | Go 1.26 + Gin + GORM | RESTful API，模块化架构 |
+| **数据库** | MySQL 8.0 | GORM ORM 自动迁移 |
+| **判题引擎** | 本地沙箱 | 真实编译执行 C++/Go/Python |
+| **认证** | JWT | 用户注册、登录、Token 鉴权 |
+| **前端** | React 19 + Vite + Tailwind CSS v4 | 组件化，响应式，暗色主题 |
+| **编辑器** | CodeMirror 6 | 语法高亮，自动缩进，括号匹配 |
 
-### 前端
-- **React 19**: 用户界面框架
-- **Vite**: 构建工具
-- **Tailwind CSS**: CSS 框架
-- **ESLint**: 代码检查
+## 功能特性
 
-## 安装和运行
+- **题目管理** — 28 道题目，覆盖 Easy / Medium 难度
+- **多语言支持** — C++17、Go、Python 三语言提交
+- **真实判题** — 编译执行 + 测试点比对 + 超时控制
+- **用户系统** — 注册 / 登录 / JWT 鉴权 / Rating
+- **排行榜** — 按评分排序，实时更新
+- **提交记录** — 历史提交查看，状态轮询
+- **比赛管理** — 比赛列表、赛程状态
+- **暗色模式** — 一键切换亮色/暗色主题
+
+## API 接口
+
+| 路由 | 方法 | 说明 | 认证 |
+|------|------|------|------|
+| `/api/health` | GET | 健康检查 | — |
+| `/api/auth/register` | POST | 用户注册 | — |
+| `/api/auth/login` | POST | 用户登录 | — |
+| `/api/problems` | GET | 题目列表 | — |
+| `/api/problems/:id` | GET | 题目详情（含样例） | — |
+| `/api/submit` | POST | 提交代码 | ✅ |
+| `/api/status/:id` | GET | 查询判题状态 | — |
+| `/api/submissions` | GET | 提交记录 | — |
+| `/api/leaderboard` | GET | 排行榜 | — |
+| `/api/contests` | GET | 比赛列表 | — |
+| `/api/profile` | GET | 用户资料 | ✅ |
+
+## 快速开始
 
 ### 环境要求
 - Go 1.26+
 - Node.js 18+
 - MySQL 8.0+
+- g++ (MinGW-w64), Python 3
 
-### 后端设置
-1. 克隆项目
-   ```bash
-   git clone https://github.com/Sakura1314lyc/golang-oj.git
-   cd golang-oj
-   ```
+### 1. 配置数据库
 
-2. 安装 Go 依赖
-   ```bash
-   go mod download
-   ```
+```bash
+# 创建数据库
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS gooj CHARACTER SET utf8mb4"
+```
 
-3. 配置数据库
-   - 创建 MySQL 数据库
-   - 修改数据库连接配置（在代码中）
+### 2. 启动后端
 
-4. 运行后端
-   ```bash
-   go run main.go
-   ```
-   服务器将在 `http://localhost:8080` 启动
+```bash
+go mod download
+go run main.go
+# 服务运行在 http://localhost:8080
+# 自动建表 + 种子数据（28 题、122 测试用例、用户、比赛）
+```
 
-### 前端设置
-1. 进入前端目录
-   ```bash
-   cd gooj-frontend
-   ```
+环境变量配置（可选）：
+| 变量 | 默认值 |
+|------|--------|
+| `DB_HOST` | localhost |
+| `DB_PORT` | 3306 |
+| `DB_USER` | root |
+| `DB_PASSWORD` | lyc061215 |
+| `DB_NAME` | gooj |
+| `JWT_SECRET` | gooj-secret-key-2024 |
+| `SERVER_PORT` | :8080 |
 
-2. 安装依赖
-   ```bash
-   npm install
-   ```
+### 3. 启动前端
 
-3. 启动开发服务器
-   ```bash
-   npm run dev
-   ```
-   前端将在 `http://localhost:5173` 启动
-
-## 使用说明
-
-1. 访问前端页面
-2. 浏览题目列表
-3. 选择题目并编写代码
-4. 提交代码进行评测
-5. 查看评测结果和状态
+```bash
+cd gooj-frontend
+npm install
+npm run dev
+# 前端运行在 http://localhost:5173
+```
 
 ## 项目结构
 
 ```
 golang-oj/
-├── main.go              # 后端主文件
-├── go.mod               # Go 模块文件
-├── go.sum               # Go 依赖校验文件
-├── gooj-frontend/       # 前端项目
-│   ├── src/
-│   │   ├── App.jsx      # 主应用组件
-│   │   ├── main.jsx     # 入口文件
-│   │   └── ...
-│   ├── package.json     # 前端依赖
-│   └── vite.config.js   # Vite 配置
-├── package.json         # 根目录依赖（Tailwind CSS）
-└── README.md            # 项目说明
+├── main.go                  # 入口
+├── config/config.go         # 配置
+├── database/db.go           # 数据库连接 + 迁移
+├── models/                  # 数据模型
+│   ├── user.go              # 用户（bcrypt 密码）
+│   ├── problem.go           # 题目
+│   ├── submission.go        # 提交记录
+│   ├── contest.go           # 比赛
+│   └── test_case.go         # 测试用例
+├── handlers/                # HTTP 处理器
+│   ├── auth.go              # 注册/登录/Profile
+│   ├── problem.go           # 题目列表/详情
+│   ├── submission.go        # 提交/状态/列表
+│   ├── contest.go           # 比赛
+│   ├── leaderboard.go       # 排行榜
+│   └── health.go            # 健康检查
+├── middleware/               # 中间件
+│   ├── cors.go              # 跨域
+│   └── auth.go              # JWT 鉴权
+├── judge/judge.go           # 判题引擎（编译+运行+比对）
+├── routes/routes.go         # 路由注册
+├── seed/seed.go             # 种子数据
+│
+└── gooj-frontend/           # 前端项目
+    └── src/
+        ├── App.jsx          # 主入口（路由、状态）
+        ├── api/client.js    # API 封装
+        ├── context/         # React Context
+        ├── components/
+        │   ├── layout/      # 布局组件
+        │   ├── dashboard/   # 仪表盘
+        │   ├── problem/     # 题目 + 编辑器
+        │   ├── auth/        # 登录/注册
+        │   └── common/      # 通用组件
+        └── index.css        # Tailwind + 动画
 ```
 
-## API 接口
+## 题目列表
 
-### 主要接口
-- `GET /api/problems` - 获取题目列表
-- `POST /api/submit` - 提交代码
-- `GET /api/submissions` - 获取提交记录
-- `GET /api/leaderboard` - 获取排行榜
-- `GET /api/contests` - 获取比赛列表
+| ID | 标题 | 难度 | 标签 |
+|----|------|------|------|
+| 1001 | A + B Problem | Easy | 数学,入门 |
+| 1002 | 反转字符串 | Easy | 字符串 |
+| 1003 | 两数之和 | Easy | 数组,哈希表 |
+| 1004 | 回文数判断 | Easy | 数学 |
+| 1005 | 最大子数组和 | Medium | 数组,动态规划 |
+| 1006 | 斐波那契数列 | Easy | 递归,动态规划 |
+| 1007 | 素数判断 | Easy | 数学 |
+| 1008 | 二分查找 | Easy | 二分,数组 |
+| 1009 | 括号匹配 | Easy | 栈,字符串 |
+| 1010 | 删除排序数组中的重复项 | Easy | 数组,双指针 |
+| 1011 | 最长公共前缀 | Easy | 字符串 |
+| 1012 | 爬楼梯 | Easy | 动态规划 |
+| 1013 | 只出现一次的数字 | Easy | 位运算 |
+| 1014 | 移动零 | Easy | 数组,双指针 |
+| 1015 | 存在重复元素 | Easy | 哈希表 |
+| 1016 | 缺失的数字 | Easy | 位运算 |
+| 1017 | 2 的幂 | Easy | 位运算 |
+| 1018 | 阶乘 | Easy | 数学 |
+| 1019 | 合并有序数组 | Easy | 数组,双指针 |
+| 1020 | 加一 | Easy | 数组 |
+| 1021 | 快乐数 | Easy | 数学,哈希表 |
+| 1022 | 计数质数 | Medium | 筛法 |
+| 1023 | 最大公约数和最小公倍数 | Easy | 数学 |
+| 1024 | 数组的最大乘积 | Easy | 数组 |
+| 1025 | 有效的字母异位词 | Easy | 字符串,哈希表 |
+| 1026 | 排序数组 | Easy | 排序 |
+| 1027 | 验证回文串 | Easy | 字符串,双指针 |
+| 1028 | 买股票的最佳时机 | Medium | 数组,动态规划 |
 
-## 开发说明
+## 判题说明
 
-### 后端开发
-- 使用 Gin 框架搭建 RESTful API
-- 使用 GORM 进行数据库操作
-- 支持 CORS 跨域请求
+支持三种语言，真实编译执行：
 
-### 前端开发
-- 使用 React Hooks 管理状态
-- 使用 Tailwind CSS 进行样式设计
-- 支持暗色主题
+- **C++**: `g++ -std=c++17 -O2` 编译 → 运行二进制
+- **Go**: `go run` 直接执行
+- **Python**: `python` 解释执行
 
-## 贡献指南
+判题流程：编译 → 逐测试点运行 → 超时控制 → 输出比对 → 返回结果
 
-欢迎提交 Issue 和 Pull Request！
+## 默认账号
 
-1. Fork 本项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-## 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
-
-## 联系方式
-
-项目维护者: Sakura1314lyc
-
-GitHub: https://github.com/Sakura1314lyc/golang-oj</content>
-<parameter name="filePath">d:\golang-oj\README.md
+| 用户名 | 密码 | Rating |
+|--------|------|--------|
+| admin | 123456 | 1500 |
+| Alice | 123456 | 1350 |
+| Bob | 123456 | 1200 |
