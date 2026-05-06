@@ -22,7 +22,7 @@ export default function Header({ dark, setDark, view, setView, onRefresh }) {
             <h1 className="truncate text-2xl font-black tracking-tight sm:text-3xl">GOOJ</h1>
             <span className="ark-tag px-2.5 py-1">JUDGE</span>
           </div>
-          <div className="ark-kicker mt-0.5">Rhodes Terminal UI</div>
+          <div className="ark-kicker mt-0.5">Ark Terminal UI</div>
         </div>
       </button>
 

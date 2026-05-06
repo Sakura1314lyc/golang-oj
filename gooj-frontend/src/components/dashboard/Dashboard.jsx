@@ -26,17 +26,17 @@ export default function Dashboard({
     <>
       <section className="ark-panel mb-5 min-h-[360px] overflow-hidden p-6 sm:p-8">
         <div className="absolute inset-0 bg-[url('/assets/operator-terminal.png')] bg-cover bg-center opacity-90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/72 to-black/18" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/94 via-black/76 to-black/18 max-sm:from-black/92 max-sm:via-black/72 max-sm:to-black/48" />
         <div className="absolute bottom-0 left-0 h-2 w-full bg-[var(--ark-red)]" />
         <div className="absolute bottom-4 right-5 hidden text-8xl font-black leading-none text-white/10 lg:block">
           01
         </div>
-        <div className="relative max-w-xl">
+        <div className="relative max-w-xl max-sm:max-w-[310px]">
           <div className="ark-kicker">Operator Control Deck</div>
           <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight max-sm:text-3xl">
             算法作战终端
           </h2>
-          <p className="mt-3 max-w-lg text-sm leading-7 text-white/68">
+          <p className="mt-3 max-w-lg text-sm leading-7 text-white/72">
             选择题目、编写代码、提交判题。界面已经切换为战术档案风格，左侧是任务列表，中部是当前作战入口，右侧同步排行榜和提交记录。
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">

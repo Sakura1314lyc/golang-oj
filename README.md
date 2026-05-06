@@ -12,10 +12,11 @@
 | **认证** | JWT | 用户注册、登录、Token 鉴权 |
 | **前端** | React 19 + Vite + Tailwind CSS v4 | 组件化，响应式，暗色主题 |
 | **编辑器** | CodeMirror 6 | C++/Go/Python 语法高亮，自动缩进，括号匹配，亮暗双主题 |
+| **题库** | Codeforces API 导入 | 120 道 CF 题目，覆盖 rating 800–2000 |
 
 ## 功能特性
 
-- **题目管理** — 28 道题目，覆盖 Easy / Medium 难度，支持搜索和标签过滤
+- **题目管理** — 148 道题目（28 道原创 + 120 道从 Codeforces 导入），覆盖 Easy / Medium / Hard 难度，支持搜索和标签过滤
 - **多语言支持** — C++17、Go、Python、Java、JavaScript 五种语言提交
 - **真实判题** — 编译执行 + 测试点比对 + 超时控制
 - **用户系统** — 注册 / 登录 / JWT 鉴权 / 资料修改 / 密码修改 / 角色权限
@@ -77,7 +78,7 @@ cp .env.example .env
 go mod download
 go run main.go
 # 服务运行在 http://localhost:8080
-# 自动建表 + 种子数据（28 题、122+ 测试用例、默认用户、比赛）
+# 自动建表 + 种子数据（28 道原创题、122+ 测试用例、默认用户、比赛）
 ```
 
 环境变量配置（可选，也可写入 `.env` 文件）：
@@ -99,6 +100,20 @@ npm install
 npm run dev
 # 前端运行在 http://localhost:5173
 ```
+
+## 题库扩展
+
+项目自带 28 道原创题目。额外提供从 Codeforces 导入题目的工具：
+
+```bash
+# 1. 下载 Codeforces 题目数据
+curl -s "https://codeforces.com/api/problemset.problems" -o tools/fetch_problems/cf_problems.json
+
+# 2. 导入数据库（自动去重，可重复执行）
+go run tools/fetch_problems/main.go
+```
+
+默认导入 rating 800–2000 范围的 120 道题目。可在 `main.go` 中调整 `maxCount` 和 rating 范围。
 
 ## 项目结构
 
@@ -131,6 +146,7 @@ golang-oj/
 ├── judge/judge.go           # 判题引擎（编译+运行+比对）
 ├── routes/routes.go         # 路由注册
 ├── seed/seed.go             # 种子数据
+├── tools/fetch_problems/    # 从 Codeforces 导入题目的工具
 │
 └── gooj-frontend/           # 前端项目
     └── src/
