@@ -24,14 +24,19 @@ export default function Leaderboard({ users }) {
               </span>
               <div className="min-w-0">
                 <div className="truncate text-sm font-bold">{u.username}</div>
-                <div className="text-xs text-white/45">{u.solved_count} solved</div>
+                <div className="text-xs text-white/45">{u.solved_count} solved · {u.accepted_count || 0} AC</div>
               </div>
             </div>
-            <div className="shrink-0 text-sm font-black text-[var(--ark-cyan)]">{u.score}</div>
+            <div className="shrink-0 text-sm font-black text-[var(--ark-cyan)]">{u.score || u.rating}</div>
           </div>
         ))}
       </div>
-      {users.length === 0 && <p className="py-6 text-center text-sm text-white/40">暂无数据</p>}
+      {users.length === 0 && (
+        <div className="flex flex-col items-center py-8">
+          <span className="text-2xl font-black text-white/15">&lt;/&gt;</span>
+          <p className="mt-1 text-xs text-white/30">排行榜暂无数据</p>
+        </div>
+      )}
     </div>
   )
 }

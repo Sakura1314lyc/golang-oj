@@ -30,7 +30,12 @@ export default function ContestList({ contests }) {
           </div>
         ))}
       </div>
-      {contests.length === 0 && <p className="py-6 text-center text-sm text-white/40">暂无比赛</p>}
+      {contests.length === 0 && (
+        <div className="flex flex-col items-center py-8">
+          <span className="text-2xl font-black text-white/15">[ ]</span>
+          <p className="mt-1 text-xs text-white/30">暂无比赛</p>
+        </div>
+      )}
     </div>
   )
 }

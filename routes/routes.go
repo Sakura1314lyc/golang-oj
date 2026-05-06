@@ -11,6 +11,11 @@ import (
 	"golang-oj/middleware"
 )
 
+// Route path helpers to avoid repeating the middleware chain
+func adminRoute(adminMw, authMw func(http.Handler) http.Handler, h http.HandlerFunc) http.Handler {
+	return adminMw(authMw(http.HandlerFunc(h)))
+}
+
 func Setup(cfg *config.Config) http.Handler {
 	mux := http.NewServeMux()
 	judgeService := judge.NewService()
@@ -22,6 +27,7 @@ func Setup(cfg *config.Config) http.Handler {
 	contestH := handlers.NewContestHandler()
 	leaderboardH := handlers.NewLeaderboardHandler()
 	userH := handlers.NewUserHandler()
+	adminH := handlers.NewAdminHandler(judgeService)
 	rl := middleware.NewRateLimiter(100, time.Minute)
 
 	authMw := middleware.JWTAuth(cfg.JWTSecret)
@@ -53,6 +59,9 @@ func Setup(cfg *config.Config) http.Handler {
 	// Users (public)
 	mux.HandleFunc("/api/users/", userH.PublicProfile)
 
+	// Announcements (public)
+	mux.HandleFunc("/api/announcements", handlers.ListActiveAnnouncements)
+
 	// Submissions (public list)
 	mux.HandleFunc("/api/submissions", submissionH.List)
 	mux.HandleFunc("/api/status/", submissionH.Status)
@@ -77,6 +86,12 @@ func Setup(cfg *config.Config) http.Handler {
 		}
 	}))))
 	mux.Handle("/api/admin/users", adminMw(authMw(http.HandlerFunc(userH.List))))
+	mux.Handle("/api/admin/announcements", adminMw(authMw(http.HandlerFunc(adminH.ListAnnouncements))))
+	mux.Handle("/api/admin/announcements/create", adminMw(authMw(http.HandlerFunc(adminH.CreateAnnouncement))))
+	mux.Handle("/api/admin/announcements/", adminMw(authMw(http.HandlerFunc(adminH.DeleteAnnouncement))))
+	mux.Handle("/api/admin/stats/problems", adminMw(authMw(http.HandlerFunc(adminH.ProblemStats))))
+	mux.Handle("/api/admin/stats/problems/", adminMw(authMw(http.HandlerFunc(adminH.ProblemStats))))
+	mux.Handle("/api/admin/rejudge/", adminMw(authMw(http.HandlerFunc(adminH.Rejudge))))
 
 	// Apply global middleware
 	var h http.Handler = mux

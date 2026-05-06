@@ -36,6 +36,7 @@ func Migrate() {
 		&models.TestCase{},
 		&models.Submission{},
 		&models.Contest{},
+		&models.Announcement{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)

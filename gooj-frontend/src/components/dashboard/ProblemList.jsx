@@ -1,6 +1,18 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef } from 'react'
 
-export default function ProblemList({ problems, selected, onSelect, query, setQuery }) {
+export default function ProblemList({ problems, selected, onSelect, query, setQuery, onSearch }) {
+  const debounceRef = useRef(null)
+
+  useEffect(() => {
+    if (!onSearch) return
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      onSearch(query)
+    }, 400)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [query, onSearch])
   const filtered = useMemo(() => {
     return problems.filter((p) => {
       const tags = Array.isArray(p.tags) ? p.tags.join(' ') : String(p.tags || '')
@@ -9,21 +21,22 @@ export default function ProblemList({ problems, selected, onSelect, query, setQu
   }, [problems, query])
 
   return (
-    <div className="ark-panel-soft p-4">
+    <div className="ark-panel-soft overflow-hidden p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
-          <div className="ark-kicker">Archives</div>
+          <div className="ark-kicker">Mission Archives</div>
           <h2 className="mt-1 text-base font-black">题目列表</h2>
         </div>
         <span className="ark-tag px-2.5 py-1">{problems.length}</span>
       </div>
+      <div className="ark-alert-tape mb-3 h-1.5 w-full opacity-80" />
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="搜索题号、标题、标签"
         className="ark-input mb-3 w-full px-3.5 py-2.5 text-sm font-bold placeholder:text-white/35"
       />
-      <div className="max-h-[calc(100vh-280px)] space-y-2 overflow-y-auto pr-1">
+      <div className="max-h-[calc(100vh-300px)] space-y-2 overflow-y-auto pr-1">
         {filtered.map((p, i) => (
           <button
             key={p.id}

@@ -11,6 +11,7 @@
   --ark-red: #e34545;
   --ark-cyan: #5ad7ff;
   --ark-amber: #d6a23f;
+  --ark-white: #f3f4f5;
 }
 
 body {
@@ -96,7 +97,18 @@ button:disabled {
     var(--ark-panel);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.26);
   backdrop-filter: blur(18px);
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+}
+
+.ark-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 18px;
+  width: 4px;
+  background: var(--ark-red);
+  z-index: 2;
 }
 
 .ark-panel-soft {
@@ -104,6 +116,7 @@ button:disabled {
   background: rgba(18, 22, 27, 0.76);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(14px);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
 }
 
 .ark-day .ark-panel,
@@ -120,6 +133,7 @@ button:disabled {
   background: linear-gradient(135deg, rgba(245, 247, 250, 0.16), rgba(245, 247, 250, 0.06));
   color: inherit;
   transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
 }
 
 .ark-button:hover {
@@ -137,6 +151,7 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: inset 4px 0 0 var(--ark-red), 0 12px 28px rgba(0, 0, 0, 0.25);
   transition: transform 0.16s ease, background 0.16s ease;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
 }
 
 .ark-button-primary:hover {
@@ -161,6 +176,89 @@ button:disabled {
   font-size: 10px;
   font-weight: 900;
   line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%);
+}
+
+.ark-logo-mark {
+  position: relative;
+  display: grid;
+  height: 52px;
+  width: 52px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02)),
+    rgba(0, 0, 0, 0.35);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.ark-logo-mark::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 10px;
+  width: 10px;
+  background: var(--ark-red);
+}
+
+.ark-image-panel {
+  overflow: hidden;
+  border: 1px solid var(--ark-line);
+  background: #090b0e;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.ark-alert-tape {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ark-red) 0,
+    var(--ark-red) 12px,
+    #0b0d10 12px,
+    #0b0d10 24px
+  );
+}
+
+.ark-corner-label {
+  border-left: 4px solid var(--ark-red);
+  background: rgba(243, 244, 245, 0.92);
+  color: #101419;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+.ark-title-slab {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(243, 244, 245, 0.96);
+  color: #0a0d10;
+  padding: 0.18em 0.26em 0.22em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  line-height: 1.02;
+}
+
+.ark-watermark {
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.08);
+  font-weight: 1000;
+  letter-spacing: 0;
+}
+
+.ark-terminal-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--ark-red), rgba(255, 255, 255, 0.28), transparent);
+}
+
+.ark-image-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 5px);
+  mix-blend-mode: overlay;
+  opacity: 0.45;
 }
 
 .ark-day .ark-tag,

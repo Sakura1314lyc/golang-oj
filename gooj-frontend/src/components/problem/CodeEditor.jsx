@@ -3,14 +3,24 @@ import CodeMirror from '@uiw/react-codemirror'
 import { cpp } from '@codemirror/lang-cpp'
 import { javascript } from '@codemirror/lang-javascript'
 import { python } from '@codemirror/lang-python'
-import { go } from '@codemirror/lang-go'
+import { java } from '@codemirror/lang-java'
 import { indentWithTab } from '@codemirror/commands'
 import { EditorView, keymap } from '@codemirror/view'
 
 const langExtensions = {
   cpp: cpp(),
-  go: go(),
+  go: javascript({ typescript: false }),
   python: python(),
+  java: java(),
+  javascript: javascript(),
+}
+
+const langLabels = {
+  cpp: 'C++',
+  go: 'Go',
+  python: 'Python',
+  java: 'Java',
+  javascript: 'JS',
 }
 
 const darkTheme = EditorView.theme({
@@ -60,8 +70,8 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
             <div className="ark-kicker">Source Editor</div>
             <h2 className="mt-1 text-lg font-black">代码编辑器</h2>
           </div>
-          <div className="flex border border-white/12 bg-black/20 p-0.5">
-            {['cpp', 'go', 'python'].map((l) => (
+          <div className="flex flex-wrap border border-white/12 bg-black/20 p-0.5">
+            {['cpp', 'go', 'python', 'java', 'javascript'].map((l) => (
               <button
                 key={l}
                 onClick={() => onLanguageChange(l)}
@@ -71,7 +81,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
                     : 'text-white/62 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {l === 'cpp' ? 'C++' : l === 'go' ? 'Go' : 'Python'}
+                {langLabels[l]}
               </button>
             ))}
           </div>

@@ -10,23 +10,26 @@
 | **数据库** | MySQL 8.0 | GORM ORM 自动迁移 |
 | **判题引擎** | 本地沙箱 | 真实编译执行 C++/Go/Python/Java/JavaScript |
 | **认证** | JWT | 用户注册、登录、Token 鉴权 |
-| **前端** | React 19 + Vite + Tailwind CSS v4 | 组件化，响应式，暗色主题 |
-| **编辑器** | CodeMirror 6 | C++/Go/Python 语法高亮，自动缩进，括号匹配，亮暗双主题 |
+| **前端** | React 19 + Vite + Tailwind CSS v4 | 组件化，响应式，暗色/亮色主题 |
+| **编辑器** | CodeMirror 6 | 五种语言语法高亮，自动缩进，括号匹配，亮暗双主题 |
 | **题库** | Codeforces API 导入 | 120 道 CF 题目，覆盖 rating 800–2000 |
 
 ## 功能特性
 
-- **题目管理** — 148 道题目（28 道原创 + 120 道从 Codeforces 导入），覆盖 Easy / Medium / Hard 难度，支持搜索和标签过滤
-- **多语言支持** — C++17、Go、Python、Java、JavaScript 五种语言提交
-- **真实判题** — 编译执行 + 测试点比对 + 超时控制
+- **题目管理** — 148 道题目（28 道原创 + 120 道 Codeforces），Easy / Medium / Hard 难度，支持搜索和标签过滤
+- **多语言支持** — C++17、Go、Python、Java、JavaScript 五种语言，各自带默认代码模板
+- **真实判题** — 编译执行 + 逐测试点比对 + 超时控制 + 内存限制
 - **用户系统** — 注册 / 登录 / JWT 鉴权 / 资料修改 / 密码修改 / 角色权限
+- **个人面板** — 用户档案下拉菜单，展示 Solved Count、Rating、提交统计
 - **排行榜** — 按评分/解题数排序，分页展示
-- **提交记录** — 分页查询，按题目/用户/状态过滤
-- **比赛管理** — 比赛列表、赛程状态、题目列表、比赛排名
-- **管理员功能** — 题目 CRUD、用户管理
+- **提交记录** — 全局提交列表 + 个人提交历史，支持按状态过滤和分页
+- **题目提交历史** — 在题目详情页内可展开查看自己对该题的所有提交记录
+- **比赛管理** — 比赛列表（Running / Upcoming / Ended）、题目列表、排名
+- **公告系统** — 管理员发布公告，前端 Dashboard 顶部展示通知横幅
+- **管理功能** — 题目 CRUD、用户管理、重新判题、题目统计、公告管理
 - **API 安全** — 速率限制、请求日志、CORS 配置
-- **优雅关停** — 信号监听，安全退出
-- **暗色模式** — 一键切换亮色/暗色主题
+- **优雅关停** — 信号监听（SIGINT/SIGTERM），安全退出
+- **暗色/亮色模式** — 一键切换，沉浸式暗色主题
 
 ## API 接口
 
@@ -35,6 +38,7 @@
 | `/api/health` | GET | 健康检查 | — |
 | `/api/auth/register` | POST | 用户注册 | — |
 | `/api/auth/login` | POST | 用户登录 | — |
+| `/api/announcements` | GET | 活跃公告列表 | — |
 | `/api/problems` | GET | 题目列表（搜索/过滤/分页） | — |
 | `/api/problems/:id` | GET | 题目详情（含样例） | — |
 | `/api/contests` | GET | 比赛列表 | — |
@@ -48,11 +52,17 @@
 | `/api/profile` | GET | 用户资料 | ✅ |
 | `/api/profile/update` | PUT | 更新资料（邮箱/头像/签名） | ✅ |
 | `/api/profile/password` | PUT | 修改密码 | ✅ |
-| `/api/my/submissions` | GET | 我的提交历史（分页） | ✅ |
+| `/api/my/submissions` | GET | 我的提交历史（分页/过滤） | ✅ |
 | `/api/admin/problems/create` | POST | 创建题目 | ✅ Admin |
 | `/api/admin/problems/:id` | PUT | 更新题目 | ✅ Admin |
 | `/api/admin/problems/:id` | DELETE | 删除题目 | ✅ Admin |
 | `/api/admin/users` | GET | 用户列表（分页） | ✅ Admin |
+| `/api/admin/rejudge/:id` | POST | 重新判题 | ✅ Admin |
+| `/api/admin/stats/problems` | GET | 全题目统计（提交数/通过率） | ✅ Admin |
+| `/api/admin/stats/problems/:id` | GET | 单题统计 | ✅ Admin |
+| `/api/admin/announcements` | GET | 公告管理列表 | ✅ Admin |
+| `/api/admin/announcements/create` | POST | 发布公告 | ✅ Admin |
+| `/api/admin/announcements/:id` | DELETE | 删除公告 | ✅ Admin |
 
 ## 快速开始
 
@@ -127,7 +137,8 @@ golang-oj/
 │   ├── problem.go           # 题目
 │   ├── submission.go        # 提交记录（状态常量）
 │   ├── contest.go           # 比赛
-│   └── test_case.go         # 测试用例
+│   ├── test_case.go         # 测试用例
+│   └── announcement.go      # 公告
 ├── handlers/                # HTTP 处理器
 │   ├── auth.go              # 注册/登录/Profile/密码修改
 │   ├── problem.go           # 题目列表/搜索/过滤/CRUD
@@ -135,6 +146,7 @@ golang-oj/
 │   ├── contest.go           # 比赛列表/详情/排名
 │   ├── leaderboard.go       # 排行榜（分页/排序）
 │   ├── user.go              # 用户列表/公开资料
+│   ├── admin.go             # 管理后台（统计/重判/公告）
 │   ├── health.go            # 健康检查
 │   ├── pagination.go        # 分页工具
 │   └── response.go          # 响应工具
@@ -152,14 +164,15 @@ golang-oj/
     └── src/
         ├── App.jsx          # 主入口（路由、状态）
         ├── api/client.js    # API 封装
-        ├── context/         # React Context
+        ├── context/         # React Context（Auth / Toast）
         ├── components/
-        │   ├── layout/      # 布局组件
-        │   ├── dashboard/   # 仪表盘
-        │   ├── problem/     # 题目 + 编辑器
-        │   ├── auth/        # 登录/注册
-        │   └── common/      # 通用组件
-        └── index.css        # Tailwind + 动画
+        │   ├── layout/      # 布局组件（Header、导航）
+        │   ├── dashboard/   # 仪表盘（题目列表/排行榜/提交记录/比赛）
+        │   ├── problem/     # 题目详情 + CodeMirror 编辑器 + 提交面板
+        │   ├── submissions/ # 个人提交记录页
+        │   ├── auth/        # 登录/注册模态框
+        │   └── common/      # 通用组件（ErrorBoundary、LoadingSkeleton）
+        └── index.css        # Tailwind + 自定义主题 + 动画
 ```
 
 ## 题目列表
@@ -210,7 +223,7 @@ golang-oj/
 ### 判题安全机制
 
 - 超时控制：每个测试点设有独立超时上下文（题目时限 + 2s 缓冲）
-- 双层超时检测：上下文取消 + 实际耗时比对，防止进程在缓冲期内被误判
+- 双层超时检测：上下文取消 + 实际耗时比对
 - 临时沙箱：每次判题在独立的临时目录中编译运行，判题完成后自动清理
 
 ## 默认账号

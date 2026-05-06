@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import Header from './components/layout/Header'
 import Dashboard from './components/dashboard/Dashboard'
+import SubmissionsView from './components/submissions/SubmissionsView'
 
 const ProblemView = lazy(() => import('./components/problem/ProblemView'))
 
@@ -33,6 +34,17 @@ const defaultCodes = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << a + b << endl;\n    return 0;\n}`,
   go: `package main\n\nimport "fmt"\n\nfunc main() {\n    var a, b int\n    fmt.Scan(&a, &b)\n    fmt.Println(a + b)\n}`,
   python: `a, b = map(int, input().split())\nprint(a + b)`,
+  java: `import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        System.out.println(a + b);\n        sc.close();\n    }\n}`,
+  javascript: `const readline = require('readline');\nconst rl = readline.createInterface({ input: process.stdin });\nrl.on('line', (line) => {\n    const [a, b] = line.split(' ').map(Number);\n    console.log(a + b);\n    rl.close();\n});`,
+}
+
+function AppFooter() {
+  return (
+    <footer className="mt-10 border-t border-white/8 pb-6 pt-6 text-center text-xs text-white/25">
+      <span className="font-bold">ArkOJ</span> Tactical Judge Terminal &mdash;
+      <span className="ml-1">基于 Go + React 构建 · v1.0</span>
+    </footer>
+  )
 }
 
 function ProblemLoader() {
@@ -62,12 +74,18 @@ function AppContent() {
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
 
-  const loadProblems = useCallback(async () => {
+  const loadProblems = useCallback(async (search = '') => {
     try {
-      const data = await api.getProblems()
+      const params = {}
+      if (search) params.q = search
+      const data = await api.getProblems(params)
       if (Array.isArray(data) && data.length > 0) {
         setProblems(data)
-        setSelected((prev) => data.find((p) => p.id === prev?.id) || data[0])
+        if (!search) {
+          setSelected((prev) => data.find((p) => p.id === prev?.id) || data[0])
+        }
+      } else if (Array.isArray(data) && data.length === 0 && !search) {
+        // keep fallback data when API returns empty on first load
       }
     } catch {
       // Use bundled fallback data when the API is unavailable.
@@ -155,7 +173,10 @@ function AppContent() {
                 submissions={submissions}
                 contests={contests}
                 loading={loading}
+                onSearch={loadProblems}
               />
+            ) : view === 'submissions' ? (
+              <SubmissionsView onBack={() => setView('dashboard')} />
             ) : (
               <Suspense fallback={<ProblemLoader />}>
                 <ProblemView
@@ -172,6 +193,7 @@ function AppContent() {
             )}
           </div>
         </ErrorBoundary>
+        <AppFooter />
       </div>
     </div>
   )

@@ -22,20 +22,20 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ success, error, info }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[100] flex max-w-[calc(100vw-2rem)] flex-col gap-2">
+      <div className="fixed bottom-6 right-6 z-[100] flex max-w-[420px] flex-col gap-2">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-slide-up border px-4 py-3 text-sm font-bold shadow-lg backdrop-blur ${
+            className={`animate-slide-up border-l-4 px-4 py-3 text-sm font-bold shadow-2xl backdrop-blur ${
               t.type === 'success'
-                ? 'border-emerald-400/40 bg-emerald-900/70 text-emerald-100'
+                ? 'border-l-emerald-400 border-white/20 bg-emerald-900/85 text-emerald-100'
                 : t.type === 'error'
-                  ? 'border-red-400/50 bg-red-950/75 text-red-100'
-                  : 'border-[var(--ark-cyan)]/45 bg-slate-950/75 text-cyan-100'
+                  ? 'border-l-[var(--ark-red)] border-white/20 bg-red-950/85 text-red-100'
+                  : 'border-l-[var(--ark-cyan)] border-white/20 bg-slate-950/85 text-cyan-100'
             }`}
           >
-            <span className="mr-2 text-white/60">
-              {t.type === 'success' ? 'OK' : t.type === 'error' ? 'ERR' : 'INFO'}
+            <span className="mr-2 text-xs uppercase tracking-wider text-white/50">
+              {t.type === 'success' ? '✓ OK' : t.type === 'error' ? '✗ ERR' : 'ℹ INFO'}
             </span>
             {t.message}
           </div>
