@@ -23,7 +23,7 @@ func (h *ProblemHandler) List(w http.ResponseWriter, r *http.Request) {
 	tag := strings.TrimSpace(r.URL.Query().Get("tag"))
 
 	query := database.DB.Model(&models.Problem{})
-	selectFields := "id, title, tags, difficulty, time_limit_ms, memory_limit"
+	selectFields := "id, title, description, tags, difficulty, time_limit_ms, memory_limit"
 
 	if search != "" {
 		like := "%" + search + "%"
@@ -49,6 +49,7 @@ func (h *ProblemHandler) List(w http.ResponseWriter, r *http.Request) {
 	type problemItem struct {
 		ID          uint     `json:"id"`
 		Title       string   `json:"title"`
+		Description string   `json:"description"`
 		Tags        []string `json:"tags"`
 		Difficulty  string   `json:"difficulty"`
 		TimeLimitMS int      `json:"time_limit_ms"`
@@ -60,6 +61,7 @@ func (h *ProblemHandler) List(w http.ResponseWriter, r *http.Request) {
 		result = append(result, problemItem{
 			ID:          p.ID,
 			Title:       p.Title,
+			Description: p.Description,
 			Tags:        p.TagList(),
 			Difficulty:  p.Difficulty,
 			TimeLimitMS: p.TimeLimitMS,

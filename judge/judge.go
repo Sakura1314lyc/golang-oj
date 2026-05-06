@@ -37,6 +37,14 @@ func (s *Service) Judge(sub *models.Submission, problem *models.Problem, testCas
 	}
 	defer os.RemoveAll(tmpDir)
 
+	// Create go.mod for Go submissions (required for Go module mode)
+	if sub.Language == "go" {
+		if err := os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module gooj_judge\ngo 1.26\n"), 0644); err != nil {
+			s.updateStatus(sub.ID, models.StatusSystemError, "--", "--", fmt.Sprintf("创建go.mod失败: %v", err))
+			return
+		}
+	}
+
 	res := s.runJudge(tmpDir, sub, problem, testCases)
 
 	s.updateStatus(sub.ID, res.Status, res.Runtime, res.Memory, res.Detail)
@@ -92,7 +100,6 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 
 	for i, tc := range testCases {
 		runCtx, runCancel := context.WithTimeout(context.Background(), time.Duration(timeLimit+2000)*time.Millisecond)
-		defer runCancel()
 
 		var cmd *exec.Cmd
 		switch sub.Language {
@@ -107,6 +114,7 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 		case "javascript":
 			cmd = exec.CommandContext(runCtx, "node", sourceFile)
 		default:
+			runCancel()
 			return result{Status: models.StatusSystemError, Runtime: "--", Detail: fmt.Sprintf("不支持的语言: %s", sub.Language)}
 		}
 
@@ -116,7 +124,8 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 		output, err := cmd.CombinedOutput()
 		elapsed := time.Since(start).Milliseconds()
 
-		if runCtx.Err() == context.DeadlineExceeded {
+		if elapsed > int64(timeLimit) || runCtx.Err() == context.DeadlineExceeded {
+			runCancel()
 			return result{
 				Status:  models.StatusTimeLimitExceeded,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
@@ -126,6 +135,7 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 		}
 
 		if err != nil {
+			runCancel()
 			return result{
 				Status:  models.StatusRuntimeError,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
@@ -139,6 +149,7 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 		got := strings.TrimSpace(string(output))
 		want := strings.TrimSpace(tc.Output)
 		if got != want {
+			runCancel()
 			return result{
 				Status:  models.StatusWrongAnswer,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
@@ -146,6 +157,7 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 				Detail:  fmt.Sprintf("测试点 #%d 输出不匹配\n预期: %s\n实际: %s", i+1, want, got),
 			}
 		}
+		runCancel()
 		passed++
 	}
 

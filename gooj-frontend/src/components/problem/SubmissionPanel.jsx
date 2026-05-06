@@ -1,73 +1,73 @@
 function getStatusColor(status) {
   const s = String(status || '').toLowerCase()
-  if (s.includes('accept')) return ['bg-emerald-100 text-emerald-700', 'dark:bg-emerald-500/15 dark:text-emerald-300']
-  if (s.includes('pending') || s.includes('judging')) return ['bg-purple-100 text-purple-700', 'dark:bg-purple-500/15 dark:text-purple-300']
-  if (s.includes('wrong')) return ['bg-red-100 text-red-700', 'dark:bg-red-500/15 dark:text-red-300']
-  if (s.includes('compile')) return ['bg-amber-100 text-amber-700', 'dark:bg-amber-500/15 dark:text-amber-300']
-  if (s.includes('time limit')) return ['bg-red-100 text-red-700', 'dark:bg-red-500/15 dark:text-red-300']
-  return ['bg-gray-100 text-gray-600', 'dark:bg-gray-500/15 dark:text-gray-400']
+  if (s.includes('accept')) return 'border-emerald-400/40 text-emerald-300'
+  if (s.includes('pending') || s.includes('judging')) return 'border-[var(--ark-cyan)]/45 text-[var(--ark-cyan)]'
+  if (s.includes('wrong')) return 'border-red-400/50 text-red-300'
+  if (s.includes('compile')) return 'border-amber-400/45 text-amber-300'
+  if (s.includes('time limit')) return 'border-red-400/50 text-red-300'
+  return 'border-white/20 text-white/55'
 }
 
 export default function SubmissionPanel({ problem, status, runtime, detail, samples }) {
-  const [statusBg, statusColor] = getStatusColor(status)
+  const statusColor = getStatusColor(status)
 
   return (
     <div className="space-y-3">
-      {/* 状态卡片 */}
-      <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-white/5 dark:bg-[#1e1933]/80">
-        <div className="mb-2 text-sm font-black">{problem.title}</div>
-        <div className="flex flex-wrap gap-1.5">
+      <div className="ark-panel-soft p-4">
+        <div className="ark-kicker">Status</div>
+        <div className="mt-1 text-sm font-black">{problem.title}</div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {Array.isArray(problem.tags) && problem.tags.map((t) => (
             <Chip key={t}>{t}</Chip>
           ))}
-          <Chip className={statusBg}>状态：{status}</Chip>
+          <Chip className={statusColor}>状态：{status}</Chip>
           <Chip>耗时：{runtime}</Chip>
           <Chip>时限：{problem.time_limit_ms || 1000}ms</Chip>
         </div>
       </div>
 
-      {/* 题目信息 */}
-      <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-white/5 dark:bg-[#1e1933]/80">
-        <div className="mb-2 text-sm font-black">题目信息</div>
-        <div className="space-y-1 text-xs opacity-70">
-          <div>难度：{problem.difficulty || 'Easy'}</div>
-          <div>内存：{problem.memory_limit_mb || 128} MB</div>
-          <div>状态：{status}</div>
+      <div className="ark-panel-soft p-4">
+        <div className="ark-kicker">Spec</div>
+        <div className="mt-2 space-y-2 text-xs text-white/68">
+          <div className="flex justify-between gap-3"><span>难度</span><strong>{problem.difficulty || 'Easy'}</strong></div>
+          <div className="flex justify-between gap-3"><span>内存</span><strong>{problem.memory_limit_mb || 128} MB</strong></div>
+          <div className="flex justify-between gap-3"><span>状态</span><strong>{status}</strong></div>
         </div>
       </div>
 
-      {/* 样例 */}
       {Array.isArray(samples) && samples.length > 0 && (
         <>
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-white/5 dark:bg-[#1e1933]/80">
-            <div className="mb-2 text-sm font-black">样例输入</div>
-            <pre className="overflow-x-auto rounded-xl border border-purple-100 bg-purple-50/50 p-3 font-mono text-xs leading-relaxed dark:border-white/5 dark:bg-white/5">
-              {samples[0]?.input || '暂无'}
-            </pre>
-          </div>
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-white/5 dark:bg-[#1e1933]/80">
-            <div className="mb-2 text-sm font-black">样例输出</div>
-            <pre className="overflow-x-auto rounded-xl border border-purple-100 bg-purple-50/50 p-3 font-mono text-xs leading-relaxed dark:border-white/5 dark:bg-white/5">
-              {samples[0]?.output || '暂无'}
-            </pre>
-          </div>
+          <SampleBlock title="样例输入" value={samples[0]?.input || '暂无'} />
+          <SampleBlock title="样例输出" value={samples[0]?.output || '暂无'} />
         </>
       )}
 
-      {/* 判题详情 */}
       {detail && (
-        <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-white/5 dark:bg-[#1e1933]/80">
-          <div className="mb-1 text-sm font-black">判题详情</div>
-          <pre className="whitespace-pre-wrap text-xs font-mono opacity-80 leading-relaxed">{detail}</pre>
+        <div className="ark-panel-soft p-4">
+          <div className="ark-kicker">Judge Detail</div>
+          <pre className="mt-2 whitespace-pre-wrap border border-white/10 bg-black/25 p-3 font-mono text-xs leading-relaxed text-white/74">
+            {detail}
+          </pre>
         </div>
       )}
     </div>
   )
 }
 
+function SampleBlock({ title, value }) {
+  return (
+    <div className="ark-panel-soft p-4">
+      <div className="ark-kicker">{title}</div>
+      <pre className="mt-2 overflow-x-auto border border-white/10 bg-black/25 p-3 font-mono text-xs leading-relaxed text-white/74">
+        {value}
+      </pre>
+    </div>
+  )
+}
+
 function Chip({ children, className = '' }) {
   return (
-    <span className={`inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-[10px] font-black dark:bg-purple-500/15 ${className || 'text-purple-700 dark:text-purple-300'}`}>
+    <span className={`ark-tag px-2.5 py-1 ${className || 'text-white/72'}`}>
       {children}
     </span>
   )

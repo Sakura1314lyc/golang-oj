@@ -13,9 +13,9 @@ export default function Dashboard({
     return (
       <>
         <StatCardSkeleton />
-        <div className="mt-4 grid grid-cols-[300px_1fr_320px] gap-4 items-start max-lg:grid-cols-1">
+        <div className="mt-4 grid grid-cols-[320px_1fr_340px] items-start gap-4 max-xl:grid-cols-[300px_1fr] max-lg:grid-cols-1">
           <ProblemListSkeleton />
-          <div className="min-h-[250px] animate-pulse rounded-2xl border border-white/70 bg-white/60 p-6 dark:border-white/5 dark:bg-white/5" />
+          <div className="ark-panel min-h-[360px] animate-pulse p-6" />
           <LeaderboardSkeleton />
         </div>
       </>
@@ -24,9 +24,36 @@ export default function Dashboard({
 
   return (
     <>
-      <StatCards profile={profile} submissionCount={submissions.length} />
+      <section className="ark-panel mb-5 min-h-[360px] overflow-hidden p-6 sm:p-8">
+        <div className="absolute inset-0 bg-[url('/assets/operator-terminal.png')] bg-cover bg-center opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/72 to-black/18" />
+        <div className="absolute bottom-0 left-0 h-2 w-full bg-[var(--ark-red)]" />
+        <div className="absolute bottom-4 right-5 hidden text-8xl font-black leading-none text-white/10 lg:block">
+          01
+        </div>
+        <div className="relative max-w-xl">
+          <div className="ark-kicker">Operator Control Deck</div>
+          <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight max-sm:text-3xl">
+            算法作战终端
+          </h2>
+          <p className="mt-3 max-w-lg text-sm leading-7 text-white/68">
+            选择题目、编写代码、提交判题。界面已经切换为战术档案风格，左侧是任务列表，中部是当前作战入口，右侧同步排行榜和提交记录。
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => onSelect(selected)}
+              className="ark-button-primary px-5 py-3 text-sm font-black"
+            >
+              进入当前题目
+            </button>
+            <span className="ark-tag px-3 py-2">ACTIVE #{selected?.id || '--'}</span>
+          </div>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-[300px_1fr_320px] gap-4 items-start max-lg:grid-cols-1">
+      <StatCards profile={profile} submissionCount={submissions.length} problemCount={problems.length} />
+
+      <div className="grid grid-cols-[320px_1fr_340px] items-start gap-4 max-xl:grid-cols-[300px_1fr] max-lg:grid-cols-1">
         <div className="max-lg:order-2">
           <ProblemList
             problems={problems}
@@ -38,25 +65,31 @@ export default function Dashboard({
         </div>
 
         <div className="space-y-4 max-lg:order-1">
-          <div className="group rounded-2xl border border-white/70 bg-gradient-to-br from-white/90 via-white/80 to-purple-50/60 p-6 shadow-sm transition hover:shadow-md dark:border-white/5 dark:from-[#1e1933]/90 dark:via-[#1e1933]/80 dark:to-purple-900/20">
-            <h2 className="text-xl font-black leading-tight">开始刷题</h2>
-            <p className="mt-2 text-sm leading-relaxed opacity-70 max-w-md">
-              选择左侧题目进入答题页面，使用带语法高亮的编辑器编写代码，提交后实时查看判题结果。
-            </p>
-            <button onClick={() => onSelect(selected)}
-              className="mt-4 rounded-xl bg-gradient-to-r from-pink-400 to-purple-400 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md hover:-translate-y-0.5 active:scale-[0.97]">
-              进入当前题目 →
-            </button>
+          <div className="ark-panel p-5">
+            <div className="ark-kicker">Briefing</div>
+            <h2 className="mt-2 text-xl font-black leading-tight">当前任务</h2>
+            <div className="mt-4 border-l-4 border-[var(--ark-red)] pl-4">
+              <div className="text-sm font-black">{selected?.title || '暂无题目'}</div>
+              <p className="mt-2 text-sm leading-6 text-white/60">
+                {selected?.description || '从题库中选择一道题目开始。'}
+              </p>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {(selected?.tags || []).map((tag) => (
+                <span key={tag} className="ark-tag px-2.5 py-1">{tag}</span>
+              ))}
+              <span className="ark-tag px-2.5 py-1">{selected?.difficulty || 'Easy'}</span>
+            </div>
           </div>
 
           <ContestList contests={contests} />
         </div>
 
-        <div className="space-y-4 max-lg:order-3">
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm transition hover:shadow-md dark:border-white/5 dark:bg-[#1e1933]/80">
+        <div className="space-y-4 max-xl:col-span-2 max-lg:order-3 max-lg:col-span-1">
+          <div className="ark-panel-soft p-4">
             <Leaderboard users={leaderboard} />
           </div>
-          <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm transition hover:shadow-md dark:border-white/5 dark:bg-[#1e1933]/80">
+          <div className="ark-panel-soft p-4">
             <RecentSubmissions submissions={submissions} />
           </div>
         </div>

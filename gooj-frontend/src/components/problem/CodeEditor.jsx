@@ -3,40 +3,41 @@ import CodeMirror from '@uiw/react-codemirror'
 import { cpp } from '@codemirror/lang-cpp'
 import { javascript } from '@codemirror/lang-javascript'
 import { python } from '@codemirror/lang-python'
+import { go } from '@codemirror/lang-go'
 import { indentWithTab } from '@codemirror/commands'
 import { EditorView, keymap } from '@codemirror/view'
 
 const langExtensions = {
   cpp: cpp(),
-  go: javascript({ typescript: false }),
+  go: go(),
   python: python(),
 }
 
 const darkTheme = EditorView.theme({
-  '&': { color: '#e8dff5', backgroundColor: '#1a1530' },
-  '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.7', padding: '16px' },
-  '.cm-cursor': { borderLeftColor: '#c4b5fd', borderLeftWidth: '2px' },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#3d2e6b' },
-  '.cm-activeLine': { backgroundColor: '#221d3a' },
-  '.cm-gutters': { backgroundColor: '#252045', border: 'none' },
-  '.cm-lineNumbers .cm-gutterElement': { color: '#6b5d8a', padding: '0 8px', fontSize: '12px' },
-  '.cm-activeLineGutter': { backgroundColor: '#2a2350' },
-  '.cm-matchingBracket': { backgroundColor: '#4a397a', outline: 'none' },
-  '.cm-nonmatchingBracket': { backgroundColor: '#7f1d1d', outline: 'none' },
+  '&': { color: '#f2f4f6', backgroundColor: '#090b0e' },
+  '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.75', padding: '16px' },
+  '.cm-cursor': { borderLeftColor: '#e34545', borderLeftWidth: '2px' },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#263745' },
+  '.cm-activeLine': { backgroundColor: '#141a20' },
+  '.cm-gutters': { backgroundColor: '#101419', border: 'none', borderRight: '1px solid rgba(255,255,255,0.08)' },
+  '.cm-lineNumbers .cm-gutterElement': { color: '#66707a', padding: '0 10px', fontSize: '12px' },
+  '.cm-activeLineGutter': { backgroundColor: '#1b222a', color: '#5ad7ff' },
+  '.cm-matchingBracket': { backgroundColor: '#243b45', outline: '1px solid rgba(90,215,255,0.35)' },
+  '.cm-nonmatchingBracket': { backgroundColor: '#4a1616', outline: 'none' },
   '&.cm-focused': { outline: 'none' },
   '.cm-scroller': { overflow: 'auto' },
 })
 
 const lightTheme = EditorView.theme({
-  '&': { color: '#4c3b5e', backgroundColor: '#faf7fd' },
-  '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.7', padding: '16px' },
-  '.cm-cursor': { borderLeftColor: '#a78bfa', borderLeftWidth: '2px' },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#e8dff5' },
-  '.cm-activeLine': { backgroundColor: '#f5f0fa' },
-  '.cm-gutters': { backgroundColor: '#f0e8f7', border: 'none' },
-  '.cm-lineNumbers .cm-gutterElement': { color: '#9b8db5', padding: '0 8px', fontSize: '12px' },
-  '.cm-activeLineGutter': { backgroundColor: '#e8dff5' },
-  '.cm-matchingBracket': { backgroundColor: '#d4c4e8', outline: 'none' },
+  '&': { color: '#17202a', backgroundColor: '#eef1f3' },
+  '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.75', padding: '16px' },
+  '.cm-cursor': { borderLeftColor: '#e34545', borderLeftWidth: '2px' },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#cbd7df' },
+  '.cm-activeLine': { backgroundColor: '#e0e6ea' },
+  '.cm-gutters': { backgroundColor: '#dce2e7', border: 'none', borderRight: '1px solid rgba(10,16,22,0.12)' },
+  '.cm-lineNumbers .cm-gutterElement': { color: '#7d8791', padding: '0 10px', fontSize: '12px' },
+  '.cm-activeLineGutter': { backgroundColor: '#d4dde3', color: '#b3212b' },
+  '.cm-matchingBracket': { backgroundColor: '#c8d9e0', outline: '1px solid rgba(22,105,132,0.35)' },
   '.cm-nonmatchingBracket': { backgroundColor: '#fecaca', outline: 'none' },
   '&.cm-focused': { outline: 'none' },
   '.cm-scroller': { overflow: 'auto' },
@@ -53,23 +54,31 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-black">代码编辑器</h2>
-          <div className="flex gap-1 rounded-xl border border-pink-200 bg-white/60 p-0.5 dark:border-white/10 dark:bg-white/5">
+      <div className="mb-3 flex items-center justify-between gap-2 max-md:flex-col max-md:items-start">
+        <div className="flex flex-wrap items-center gap-3">
+          <div>
+            <div className="ark-kicker">Source Editor</div>
+            <h2 className="mt-1 text-lg font-black">代码编辑器</h2>
+          </div>
+          <div className="flex border border-white/12 bg-black/20 p-0.5">
             {['cpp', 'go', 'python'].map((l) => (
-              <button key={l} onClick={() => onLanguageChange(l)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${language === l
-                  ? 'bg-gradient-to-r from-pink-400 to-purple-400 text-white shadow-sm'
-                  : 'text-[#704b84] hover:bg-white/50 dark:text-[#dbcaff] dark:hover:bg-white/10'}`}>
+              <button
+                key={l}
+                onClick={() => onLanguageChange(l)}
+                className={`px-3 py-1.5 text-xs font-black transition ${
+                  language === l
+                    ? 'bg-[var(--ark-red)] text-white'
+                    : 'text-white/62 hover:bg-white/10 hover:text-white'
+                }`}
+              >
                 {l === 'cpp' ? 'C++' : l === 'go' ? 'Go' : 'Python'}
               </button>
             ))}
           </div>
         </div>
-        <span className="rounded-full bg-purple-100 px-3 py-1 text-[11px] font-black tracking-wider dark:bg-white/10 dark:text-[#dbcaff]">EDITOR</span>
+        <span className="ark-tag px-3 py-1">EDITOR</span>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-pink-200 shadow-sm dark:border-white/10">
+      <div className="code-shell overflow-hidden border border-white/14 shadow-2xl">
         <CodeMirror
           value={value}
           onChange={handleChange}

@@ -23,6 +23,11 @@ async function request(path, options = {}) {
   return data
 }
 
+// Unwrap paginated API responses: extract the inner data array
+function paginated(path, options = {}) {
+  return request(path, options).then((res) => (res && res.data) || res)
+}
+
 export const api = {
   // Auth
   register: (username, password) =>
@@ -33,8 +38,8 @@ export const api = {
 
   getProfile: () => request('/profile'),
 
-  // Problems
-  getProblems: () => request('/problems'),
+  // Problems (paginated)
+  getProblems: () => paginated('/problems'),
   getProblem: (id) => request(`/problems/${id}`),
 
   // Submissions
@@ -42,11 +47,11 @@ export const api = {
     request('/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problem_id: problemId, language, code }) }),
 
   getStatus: (id) => request(`/status/${id}`),
-  getSubmissions: () => request('/submissions'),
+  getSubmissions: () => paginated('/submissions'),
 
-  // Contests
+  // Contests (returns plain array, no pagination wrapper)
   getContests: () => request('/contests'),
 
-  // Leaderboard
-  getLeaderboard: () => request('/leaderboard'),
+  // Leaderboard (paginated)
+  getLeaderboard: () => paginated('/leaderboard'),
 }

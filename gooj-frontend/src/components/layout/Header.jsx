@@ -7,44 +7,47 @@ export default function Header({ dark, setDark, view, setView, onRefresh }) {
   const [showAuth, setShowAuth] = useState(false)
 
   return (
-    <header className="mb-5 flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2.5">
-          <h1 className="text-3xl font-black tracking-tighter">GOOJ</h1>
-          <span className="hidden rounded-full bg-purple-100 px-2.5 py-0.5 text-[10px] font-black tracking-widest sm:inline-block dark:bg-purple-500/15 dark:text-purple-300">
-            JUDGE
-          </span>
+    <header className="mb-5 flex items-center justify-between gap-4 max-lg:flex-wrap max-sm:flex-col max-sm:items-start">
+      <button
+        onClick={() => setView('dashboard')}
+        className="group flex min-w-0 items-center gap-3 text-left"
+        title="返回控制台"
+      >
+        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center border border-white/20 bg-white/10">
+          <div className="absolute left-0 top-0 h-2 w-2 bg-[var(--ark-red)]" />
+          <span className="text-lg font-black tracking-tight">G</span>
         </div>
-      </div>
-      <div className="flex items-center gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="truncate text-2xl font-black tracking-tight sm:text-3xl">GOOJ</h1>
+            <span className="ark-tag px-2.5 py-1">JUDGE</span>
+          </div>
+          <div className="ark-kicker mt-0.5">Rhodes Terminal UI</div>
+        </div>
+      </button>
+
+      <div className="flex flex-wrap items-center justify-end gap-2 max-sm:w-full max-sm:justify-start">
         {view === 'problem' && (
-          <button onClick={() => setView('dashboard')}
-            className="rounded-xl border border-pink-200 bg-white/70 px-3.5 py-2 text-xs font-bold text-[#704b84] transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-[#dbcaff] dark:hover:bg-white/10">
-            ← 题库
+          <button onClick={() => setView('dashboard')} className="ark-button px-3.5 py-2 text-xs font-black">
+            题库
           </button>
         )}
-        <button onClick={() => setDark(!dark)}
-          className="rounded-xl border border-pink-200 bg-white/70 px-3.5 py-2 text-xs font-bold text-[#704b84] transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-[#dbcaff] dark:hover:bg-white/10">
-          {dark ? '☀' : '☾'}
+        <button onClick={() => setDark(!dark)} className="ark-button px-3.5 py-2 text-xs font-black">
+          {dark ? '日间' : '夜战'}
         </button>
-        <button onClick={onRefresh}
-          className="rounded-xl bg-gradient-to-r from-pink-400 to-purple-400 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:shadow-md active:scale-[0.97]">
+        <button onClick={onRefresh} className="ark-button px-3.5 py-2 text-xs font-black">
           刷新
         </button>
         {user ? (
           <div className="flex items-center gap-2">
-            <span className="rounded-xl bg-purple-100 px-3 py-1.5 text-xs font-bold dark:bg-purple-500/15 dark:text-purple-300">
-              {user.username}
-            </span>
-            <button onClick={logout}
-              className="rounded-xl border border-pink-200 bg-white/70 px-3 py-1.5 text-xs font-bold text-[#704b84] transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-[#dbcaff] dark:hover:bg-white/10">
+            <span className="ark-tag px-3 py-2">{user.username}</span>
+            <button onClick={logout} className="ark-button px-3 py-2 text-xs font-black">
               退出
             </button>
           </div>
         ) : (
           <>
-            <button onClick={() => setShowAuth(true)}
-              className="rounded-xl border border-pink-200 bg-white/70 px-3.5 py-2 text-xs font-bold text-[#704b84] transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-[#dbcaff] dark:hover:bg-white/10">
+            <button onClick={() => setShowAuth(true)} className="ark-button-primary px-4 py-2 text-xs font-black">
               登录
             </button>
             {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
