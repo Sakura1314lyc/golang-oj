@@ -6,22 +6,25 @@
 
 | 层级 | 技术 | 说明 |
 |------|------|------|
-| **后端** | Go 1.26 + Gin + GORM | RESTful API，模块化架构 |
+| **后端** | Go 1.26 + GORM | RESTful API，模块化架构 |
 | **数据库** | MySQL 8.0 | GORM ORM 自动迁移 |
-| **判题引擎** | 本地沙箱 | 真实编译执行 C++/Go/Python |
+| **判题引擎** | 本地沙箱 | 真实编译执行 C++/Go/Python/Java/JavaScript |
 | **认证** | JWT | 用户注册、登录、Token 鉴权 |
 | **前端** | React 19 + Vite + Tailwind CSS v4 | 组件化，响应式，暗色主题 |
 | **编辑器** | CodeMirror 6 | 语法高亮，自动缩进，括号匹配 |
 
 ## 功能特性
 
-- **题目管理** — 28 道题目，覆盖 Easy / Medium 难度
-- **多语言支持** — C++17、Go、Python 三语言提交
+- **题目管理** — 28 道题目，覆盖 Easy / Medium 难度，支持搜索和标签过滤
+- **多语言支持** — C++17、Go、Python、Java、JavaScript 五种语言提交
 - **真实判题** — 编译执行 + 测试点比对 + 超时控制
-- **用户系统** — 注册 / 登录 / JWT 鉴权 / Rating
-- **排行榜** — 按评分排序，实时更新
-- **提交记录** — 历史提交查看，状态轮询
-- **比赛管理** — 比赛列表、赛程状态
+- **用户系统** — 注册 / 登录 / JWT 鉴权 / 资料修改 / 密码修改 / 角色权限
+- **排行榜** — 按评分/解题数排序，分页展示
+- **提交记录** — 分页查询，按题目/用户/状态过滤
+- **比赛管理** — 比赛列表、赛程状态、题目列表、比赛排名
+- **管理员功能** — 题目 CRUD、用户管理
+- **API 安全** — 速率限制、请求日志、CORS 配置
+- **优雅关停** — 信号监听，安全退出
 - **暗色模式** — 一键切换亮色/暗色主题
 
 ## API 接口
@@ -31,14 +34,24 @@
 | `/api/health` | GET | 健康检查 | — |
 | `/api/auth/register` | POST | 用户注册 | — |
 | `/api/auth/login` | POST | 用户登录 | — |
-| `/api/problems` | GET | 题目列表 | — |
+| `/api/problems` | GET | 题目列表（搜索/过滤/分页） | — |
 | `/api/problems/:id` | GET | 题目详情（含样例） | — |
-| `/api/submit` | POST | 提交代码 | ✅ |
-| `/api/status/:id` | GET | 查询判题状态 | — |
-| `/api/submissions` | GET | 提交记录 | — |
-| `/api/leaderboard` | GET | 排行榜 | — |
 | `/api/contests` | GET | 比赛列表 | — |
+| `/api/contests/:id` | GET | 比赛详情（含题目列表） | — |
+| `/api/contests/:id/rank` | GET | 比赛排名 | — |
+| `/api/leaderboard` | GET | 排行榜（分页/排序） | — |
+| `/api/submissions` | GET | 提交记录（分页/过滤） | — |
+| `/api/status/:id` | GET | 查询判题状态 | — |
+| `/api/users/:id` | GET | 用户公开资料 | — |
+| `/api/submit` | POST | 提交代码 | ✅ |
 | `/api/profile` | GET | 用户资料 | ✅ |
+| `/api/profile/update` | PUT | 更新资料（邮箱/头像/签名） | ✅ |
+| `/api/profile/password` | PUT | 修改密码 | ✅ |
+| `/api/my/submissions` | GET | 我的提交历史（分页） | ✅ |
+| `/api/admin/problems/create` | POST | 创建题目 | ✅ Admin |
+| `/api/admin/problems/:id` | PUT | 更新题目 | ✅ Admin |
+| `/api/admin/problems/:id` | DELETE | 删除题目 | ✅ Admin |
+| `/api/admin/users` | GET | 用户列表（分页） | ✅ Admin |
 
 ## 快速开始
 
@@ -46,7 +59,7 @@
 - Go 1.26+
 - Node.js 18+
 - MySQL 8.0+
-- g++ (MinGW-w64), Python 3
+- g++ (MinGW-w64)、Python 3、Java JDK (可选)、Node.js (可选)
 
 ### 1. 配置数据库
 
@@ -58,13 +71,16 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS gooj CHARACTER SET utf8mb4"
 ### 2. 启动后端
 
 ```bash
+# 可选：从 .env 文件加载配置
+cp .env.example .env
+
 go mod download
 go run main.go
 # 服务运行在 http://localhost:8080
-# 自动建表 + 种子数据（28 题、122 测试用例、用户、比赛）
+# 自动建表 + 种子数据（28 题、122+ 测试用例、默认用户、比赛）
 ```
 
-环境变量配置（可选）：
+环境变量配置（可选，也可写入 `.env` 文件）：
 | 变量 | 默认值 |
 |------|--------|
 | `DB_HOST` | localhost |
@@ -88,25 +104,30 @@ npm run dev
 
 ```
 golang-oj/
-├── main.go                  # 入口
-├── config/config.go         # 配置
+├── main.go                  # 入口（优雅关停）
+├── config/config.go         # 配置（支持 .env 文件）
 ├── database/db.go           # 数据库连接 + 迁移
 ├── models/                  # 数据模型
-│   ├── user.go              # 用户（bcrypt 密码）
+│   ├── user.go              # 用户（bcrypt 密码 + 角色）
 │   ├── problem.go           # 题目
-│   ├── submission.go        # 提交记录
+│   ├── submission.go        # 提交记录（状态常量）
 │   ├── contest.go           # 比赛
 │   └── test_case.go         # 测试用例
 ├── handlers/                # HTTP 处理器
-│   ├── auth.go              # 注册/登录/Profile
-│   ├── problem.go           # 题目列表/详情
-│   ├── submission.go        # 提交/状态/列表
-│   ├── contest.go           # 比赛
-│   ├── leaderboard.go       # 排行榜
-│   └── health.go            # 健康检查
+│   ├── auth.go              # 注册/登录/Profile/密码修改
+│   ├── problem.go           # 题目列表/搜索/过滤/CRUD
+│   ├── submission.go        # 提交/状态/列表/我的提交
+│   ├── contest.go           # 比赛列表/详情/排名
+│   ├── leaderboard.go       # 排行榜（分页/排序）
+│   ├── user.go              # 用户列表/公开资料
+│   ├── health.go            # 健康检查
+│   ├── pagination.go        # 分页工具
+│   └── response.go          # 响应工具
 ├── middleware/               # 中间件
+│   ├── auth.go              # JWT 鉴权 + Admin 验证
 │   ├── cors.go              # 跨域
-│   └── auth.go              # JWT 鉴权
+│   ├── logging.go           # 请求日志
+│   └── ratelimit.go         # 速率限制
 ├── judge/judge.go           # 判题引擎（编译+运行+比对）
 ├── routes/routes.go         # 路由注册
 ├── seed/seed.go             # 种子数据
@@ -160,18 +181,21 @@ golang-oj/
 
 ## 判题说明
 
-支持三种语言，真实编译执行：
+支持五种语言，真实编译执行：
 
 - **C++**: `g++ -std=c++17 -O2` 编译 → 运行二进制
 - **Go**: `go run` 直接执行
 - **Python**: `python` 解释执行
+- **Java**: `javac` 编译 → `java` 运行
+- **JavaScript**: `node` 解释执行
 
 判题流程：编译 → 逐测试点运行 → 超时控制 → 输出比对 → 返回结果
 
 ## 默认账号
 
-| 用户名 | 密码 | Rating |
-|--------|------|--------|
-| admin | 123456 | 1500 |
-| Alice | 123456 | 1350 |
-| Bob | 123456 | 1200 |
+| 用户名 | 密码 | 角色 | Rating |
+|--------|------|------|--------|
+| admin | 123456 | Admin | 1500 |
+| Alice | 123456 | User | 1350 |
+| Bob | 123456 | User | 1200 |
+| Charlie | 123456 | User | 1100 |

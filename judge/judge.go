@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -27,20 +28,20 @@ type result struct {
 }
 
 func (s *Service) Judge(sub *models.Submission, problem *models.Problem, testCases []models.TestCase) {
-	s.updateStatus(sub.ID, "Judging", "--", "正在编译并执行测试点...")
+	s.updateStatus(sub.ID, models.StatusJudging, "--", "--", "正在编译并执行测试点...")
 
 	tmpDir, err := os.MkdirTemp("", "gooj-*")
 	if err != nil {
-		s.updateStatus(sub.ID, "System Error", "--", fmt.Sprintf("创建临时目录失败: %v", err))
+		s.updateStatus(sub.ID, models.StatusSystemError, "--", "--", fmt.Sprintf("创建临时目录失败: %v", err))
 		return
 	}
 	defer os.RemoveAll(tmpDir)
 
 	res := s.runJudge(tmpDir, sub, problem, testCases)
 
-	s.updateStatus(sub.ID, res.Status, res.Runtime, res.Detail)
+	s.updateStatus(sub.ID, res.Status, res.Runtime, res.Memory, res.Detail)
 
-	if res.Status == "Accepted" {
+	if res.Status == models.StatusAccepted {
 		database.DB.Model(&models.User{}).Where("id = ?", sub.UserID).
 			Updates(map[string]any{
 				"accepted_count": database.DB.Raw("accepted_count + 1"),
@@ -53,24 +54,33 @@ func (s *Service) Judge(sub *models.Submission, problem *models.Problem, testCas
 func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *models.Problem, testCases []models.TestCase) result {
 	sourceFile := filepath.Join(tmpDir, sourceFileName(sub.Language))
 	if err := os.WriteFile(sourceFile, []byte(sub.Code), 0644); err != nil {
-		return result{Status: "System Error", Runtime: "--", Detail: fmt.Sprintf("写入代码文件失败: %v", err)}
+		return result{Status: models.StatusSystemError, Runtime: "--", Detail: fmt.Sprintf("写入代码文件失败: %v", err)}
 	}
 
 	execPath := sourceFile
-	compileCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	compileCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if sub.Language == "cpp" {
-		execPath = filepath.Join(tmpDir, "prog.exe")
+	// Compilation step
+	switch sub.Language {
+	case "cpp":
+		execPath = filepath.Join(tmpDir, "prog"+exeSuffix())
 		cmd := exec.CommandContext(compileCtx, "g++", sourceFile, "-o", execPath, "-std=c++17", "-O2", "-lm")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return result{Status: "Compile Error", Runtime: "--", Detail: string(output)}
+			return result{Status: models.StatusCompileError, Runtime: "--", Detail: string(output)}
+		}
+	case "java":
+		execPath = filepath.Join(tmpDir, "Main")
+		cmd := exec.CommandContext(compileCtx, "javac", sourceFile, "-d", tmpDir)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return result{Status: models.StatusCompileError, Runtime: "--", Detail: string(output)}
 		}
 	}
 
 	if len(testCases) == 0 {
-		return result{Status: "Accepted", Runtime: "0 ms", Detail: "通过 0/0 个测试点（无测试数据）"}
+		return result{Status: models.StatusAccepted, Runtime: "0 ms", Memory: "0 KB", Detail: "通过 0/0 个测试点（无测试数据）"}
 	}
 
 	passed := 0
@@ -81,8 +91,8 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 	}
 
 	for i, tc := range testCases {
-		runCtx, cancel := context.WithTimeout(context.Background(), time.Duration(timeLimit+1000)*time.Millisecond)
-		start := time.Now()
+		runCtx, runCancel := context.WithTimeout(context.Background(), time.Duration(timeLimit+2000)*time.Millisecond)
+		defer runCancel()
 
 		var cmd *exec.Cmd
 		switch sub.Language {
@@ -92,29 +102,34 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 			cmd = exec.CommandContext(runCtx, "go", "run", sourceFile)
 		case "python":
 			cmd = exec.CommandContext(runCtx, "python", sourceFile)
+		case "java":
+			cmd = exec.CommandContext(runCtx, "java", "-cp", tmpDir, "Main")
+		case "javascript":
+			cmd = exec.CommandContext(runCtx, "node", sourceFile)
 		default:
-			cancel()
-			return result{Status: "System Error", Runtime: "--", Detail: fmt.Sprintf("不支持的语言: %s", sub.Language)}
+			return result{Status: models.StatusSystemError, Runtime: "--", Detail: fmt.Sprintf("不支持的语言: %s", sub.Language)}
 		}
 
+		start := time.Now()
 		cmd.Dir = tmpDir
 		cmd.Stdin = strings.NewReader(tc.Input)
 		output, err := cmd.CombinedOutput()
 		elapsed := time.Since(start).Milliseconds()
-		cancel()
 
 		if runCtx.Err() == context.DeadlineExceeded {
 			return result{
-				Status:  "Time Limit Exceeded",
+				Status:  models.StatusTimeLimitExceeded,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
+				Memory:  "--",
 				Detail:  fmt.Sprintf("测试点 #%d 超时（限制 %d ms）", i+1, timeLimit),
 			}
 		}
 
 		if err != nil {
 			return result{
-				Status:  "Runtime Error",
+				Status:  models.StatusRuntimeError,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
+				Memory:  "--",
 				Detail:  fmt.Sprintf("测试点 #%d 运行错误: %s", i+1, string(output)),
 			}
 		}
@@ -125,26 +140,30 @@ func (s *Service) runJudge(tmpDir string, sub *models.Submission, problem *model
 		want := strings.TrimSpace(tc.Output)
 		if got != want {
 			return result{
-				Status:  "Wrong Answer",
+				Status:  models.StatusWrongAnswer,
 				Runtime: fmt.Sprintf("%d ms", elapsed),
+				Memory:  "--",
 				Detail:  fmt.Sprintf("测试点 #%d 输出不匹配\n预期: %s\n实际: %s", i+1, want, got),
 			}
 		}
 		passed++
 	}
 
+	avgTime := totalTime / int64(len(testCases))
 	return result{
-		Status:  "Accepted",
-		Runtime: fmt.Sprintf("%d ms", totalTime/int64(len(testCases))),
+		Status:  models.StatusAccepted,
+		Runtime: fmt.Sprintf("%d ms", avgTime),
+		Memory:  "--",
 		Detail:  fmt.Sprintf("通过 %d/%d 个测试点", passed, len(testCases)),
 	}
 }
 
-func (s *Service) updateStatus(subID uint, status, runtime, detail string) {
+func (s *Service) updateStatus(subID uint, status, runtime, memory, detail string) {
 	database.DB.Model(&models.Submission{}).Where("id = ?", subID).
 		Updates(map[string]any{
 			"status":  status,
 			"runtime": runtime,
+			"memory":  memory,
 			"detail":  detail,
 		})
 }
@@ -152,7 +171,7 @@ func (s *Service) updateStatus(subID uint, status, runtime, detail string) {
 func (s *Service) recalcSolved(userID uint) {
 	var solved int64
 	database.DB.Model(&models.Submission{}).
-		Where("user_id = ? AND status = ?", userID, "Accepted").
+		Where("user_id = ? AND status = ?", userID, models.StatusAccepted).
 		Distinct("problem_id").Count(&solved)
 	database.DB.Model(&models.User{}).Where("id = ?", userID).
 		Update("solved_count", solved)
@@ -166,7 +185,18 @@ func sourceFileName(lang string) string {
 		return "main.go"
 	case "python":
 		return "main.py"
+	case "java":
+		return "Main.java"
+	case "javascript":
+		return "main.js"
 	default:
 		return "source.txt"
 	}
+}
+
+func exeSuffix() string {
+	if runtime.GOOS == "windows" {
+		return ".exe"
+	}
+	return ""
 }

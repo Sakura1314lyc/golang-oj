@@ -10,6 +10,8 @@ type Problem struct {
 	OutputDesc  string    `gorm:"type:text" json:"output_desc"`
 	Tags        string    `gorm:"size:512" json:"tags"`
 	Difficulty  string    `gorm:"size:32" json:"difficulty"`
+	Source      string    `gorm:"size:256" json:"source,omitempty"`
+	Solution    string    `gorm:"type:text" json:"solution,omitempty"`
 	TimeLimitMS int       `gorm:"default:1000" json:"time_limit_ms"`
 	MemoryLimit int       `gorm:"default:128" json:"memory_limit_mb"`
 	CreatedAt   time.Time `json:"created_at"`

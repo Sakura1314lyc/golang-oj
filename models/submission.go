@@ -14,5 +14,18 @@ type Submission struct {
 	Runtime     string    `gorm:"size:32;default:'--'" json:"runtime"`
 	Memory      string    `gorm:"size:32;default:'--'" json:"memory"`
 	Detail      string    `gorm:"type:text" json:"detail"`
+	Score       int       `gorm:"default:0" json:"score"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+const (
+	StatusPending            = "Pending"
+	StatusJudging            = "Judging"
+	StatusAccepted           = "Accepted"
+	StatusCompileError       = "Compile Error"
+	StatusRuntimeError       = "Runtime Error"
+	StatusWrongAnswer        = "Wrong Answer"
+	StatusTimeLimitExceeded  = "Time Limit Exceeded"
+	StatusMemoryLimitExceeded = "Memory Limit Exceeded"
+	StatusSystemError        = "System Error"
+)

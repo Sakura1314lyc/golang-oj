@@ -58,9 +58,10 @@ func (h *SubmissionHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		ProblemName: problem.Title,
 		Language:    lang,
 		Code:        req.Code,
-		Status:      "Pending",
+		Status:      models.StatusPending,
 		Runtime:     "--",
 		Detail:      "等待进入判题队列",
+		Score:       0,
 		CreatedAt:   time.Now(),
 	}
 
@@ -97,11 +98,57 @@ func (h *SubmissionHandler) Status(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SubmissionHandler) List(w http.ResponseWriter, r *http.Request) {
-	var subs []models.Submission
-	database.DB.Select("id, user_id, username, problem_id, problem_name, language, status, runtime, memory, detail, created_at").
-		Order("created_at desc").Limit(50).Find(&subs)
+	page, pageSize := parsePagination(r)
 
-	writeJSON(w, http.StatusOK, subs)
+	query := database.DB.Model(&models.Submission{})
+	selectFields := "id, user_id, username, problem_id, problem_name, language, status, runtime, memory, score, created_at"
+
+	// Filter by problem
+	if pid := r.URL.Query().Get("problem_id"); pid != "" {
+		query = query.Where("problem_id = ?", pid)
+	}
+	// Filter by user
+	if uid := r.URL.Query().Get("user_id"); uid != "" {
+		query = query.Where("user_id = ?", uid)
+	}
+	// Filter by status
+	if status := r.URL.Query().Get("status"); status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	var total int64
+	query.Select(selectFields).Count(&total)
+
+	var subs []models.Submission
+	query.Select(selectFields).
+		Order("created_at desc").
+		Offset((page - 1) * pageSize).
+		Limit(pageSize).
+		Find(&subs)
+
+	writePaginated(w, subs, page, pageSize, total)
+}
+
+func (h *SubmissionHandler) UserSubmissions(w http.ResponseWriter, r *http.Request) {
+	userID, _ := r.Context().Value(middleware.UserIDKey).(uint)
+	page, pageSize := parsePagination(r)
+
+	var total int64
+	database.DB.Model(&models.Submission{}).Where("user_id = ?", userID).Count(&total)
+
+	var subs []models.Submission
+	database.DB.Select("id, user_id, username, problem_id, problem_name, language, status, runtime, memory, score, created_at").
+		Where("user_id = ?", userID).
+		Order("created_at desc").
+		Offset((page - 1) * pageSize).
+		Limit(pageSize).
+		Find(&subs)
+
+	for i := range subs {
+		subs[i].Code = ""
+	}
+
+	writePaginated(w, subs, page, pageSize, total)
 }
 
 func normalizeLang(s string) string {
@@ -113,6 +160,10 @@ func normalizeLang(s string) string {
 		return "go"
 	case "python", "py", "python3":
 		return "python"
+	case "java":
+		return "java"
+	case "javascript", "js", "node":
+		return "javascript"
 	default:
 		return s
 	}

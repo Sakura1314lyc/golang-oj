@@ -24,6 +24,7 @@ func NewAuthHandler(jwtSecret string) *AuthHandler {
 type registerReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Email    string `json:"email,omitempty"`
 }
 
 type loginReq struct {
@@ -34,6 +35,17 @@ type loginReq struct {
 type authResp struct {
 	Token string       `json:"token"`
 	User  *models.User `json:"user"`
+}
+
+type updateProfileReq struct {
+	Email  string `json:"email,omitempty"`
+	Avatar string `json:"avatar,omitempty"`
+	Bio    string `json:"bio,omitempty"`
+}
+
+type changePasswordReq struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +78,9 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	user := models.User{
 		Username: req.Username,
 		Password: string(hashed),
+		Email:    req.Email,
 		Rating:   1200,
+		Role:     models.RoleUser,
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -118,6 +132,63 @@ func (h *AuthHandler) Profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, &user)
+}
+
+func (h *AuthHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	userID, _ := r.Context().Value(middleware.UserIDKey).(uint)
+	var req updateProfileReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "无效的请求格式")
+		return
+	}
+
+	updates := map[string]any{}
+	if req.Email != "" {
+		updates["email"] = req.Email
+	}
+	if req.Avatar != "" {
+		updates["avatar"] = req.Avatar
+	}
+	if req.Bio != "" {
+		updates["bio"] = req.Bio
+	}
+
+	if len(updates) > 0 {
+		database.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates)
+	}
+
+	var user models.User
+	database.DB.First(&user, userID)
+	writeJSON(w, http.StatusOK, &user)
+}
+
+func (h *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	userID, _ := r.Context().Value(middleware.UserIDKey).(uint)
+	var req changePasswordReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "无效的请求格式")
+		return
+	}
+
+	var user models.User
+	if database.DB.First(&user, userID).Error != nil {
+		writeError(w, http.StatusNotFound, "用户不存在")
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
+		writeError(w, http.StatusBadRequest, "原密码错误")
+		return
+	}
+
+	if len(req.NewPassword) < 4 {
+		writeError(w, http.StatusBadRequest, "新密码至少需要 4 位")
+		return
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	database.DB.Model(&user).Update("password", string(hashed))
+	writeMsg(w, http.StatusOK, "密码修改成功")
 }
 
 func (h *AuthHandler) generateToken(userID uint, username string) (string, error) {

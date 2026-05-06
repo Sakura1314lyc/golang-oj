@@ -25,10 +25,10 @@ func seedUsers() {
 	}
 	pass, _ := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 	users := []models.User{
-		{Username: "admin", Password: string(pass), Rating: 1500, SolvedCount: 10, SubmitCount: 30, AcceptedCount: 25},
-		{Username: "Alice", Password: string(pass), Rating: 1350, SolvedCount: 8, SubmitCount: 20, AcceptedCount: 15},
-		{Username: "Bob", Password: string(pass), Rating: 1200, SolvedCount: 5, SubmitCount: 18, AcceptedCount: 10},
-		{Username: "Charlie", Password: string(pass), Rating: 1100, SolvedCount: 3, SubmitCount: 12, AcceptedCount: 6},
+		{Username: "admin", Password: string(pass), Email: "admin@gooj.com", Role: "admin", Rating: 1500, SolvedCount: 10, SubmitCount: 30, AcceptedCount: 25},
+		{Username: "Alice", Password: string(pass), Email: "alice@gooj.com", Role: "user", Rating: 1350, SolvedCount: 8, SubmitCount: 20, AcceptedCount: 15},
+		{Username: "Bob", Password: string(pass), Email: "bob@gooj.com", Role: "user", Rating: 1200, SolvedCount: 5, SubmitCount: 18, AcceptedCount: 10},
+		{Username: "Charlie", Password: string(pass), Email: "charlie@gooj.com", Role: "user", Rating: 1100, SolvedCount: 3, SubmitCount: 12, AcceptedCount: 6},
 	}
 	for _, u := range users {
 		database.DB.Create(&u)
