@@ -25,10 +25,10 @@ func seedUsers() {
 	}
 	pass, _ := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 	users := []models.User{
-		{Username: "admin", Password: string(pass), Email: "admin@gooj.com", Role: "admin", Rating: 1500, SolvedCount: 10, SubmitCount: 30, AcceptedCount: 25},
-		{Username: "Alice", Password: string(pass), Email: "alice@gooj.com", Role: "user", Rating: 1350, SolvedCount: 8, SubmitCount: 20, AcceptedCount: 15},
-		{Username: "Bob", Password: string(pass), Email: "bob@gooj.com", Role: "user", Rating: 1200, SolvedCount: 5, SubmitCount: 18, AcceptedCount: 10},
-		{Username: "Charlie", Password: string(pass), Email: "charlie@gooj.com", Role: "user", Rating: 1100, SolvedCount: 3, SubmitCount: 12, AcceptedCount: 6},
+		{Username: "admin", Password: string(pass), Email: "admin@ark-oj.local", Role: "admin", Rating: 1500, SolvedCount: 10, SubmitCount: 30, AcceptedCount: 25},
+		{Username: "Alice", Password: string(pass), Email: "alice@ark-oj.local", Role: "user", Rating: 1350, SolvedCount: 8, SubmitCount: 20, AcceptedCount: 15},
+		{Username: "Bob", Password: string(pass), Email: "bob@ark-oj.local", Role: "user", Rating: 1200, SolvedCount: 5, SubmitCount: 18, AcceptedCount: 10},
+		{Username: "Charlie", Password: string(pass), Email: "charlie@ark-oj.local", Role: "user", Rating: 1100, SolvedCount: 3, SubmitCount: 12, AcceptedCount: 6},
 	}
 	for _, u := range users {
 		database.DB.Create(&u)
@@ -264,7 +264,7 @@ func seedTestCases() {
 		{ProblemID: 1001, Input: "0 0\n", Output: "0", IsSample: false},
 		// 1002 - Reverse String
 		{ProblemID: 1002, Input: "hello\n", Output: "olleh", IsSample: true},
-		{ProblemID: 1002, Input: "GOOJ\n", Output: "JOOG", IsSample: true},
+		{ProblemID: 1002, Input: "ark-OJ\n", Output: "JO-kra", IsSample: true},
 		{ProblemID: 1002, Input: "a\n", Output: "a", IsSample: false},
 		{ProblemID: 1002, Input: "12345\n", Output: "54321", IsSample: false},
 		{ProblemID: 1002, Input: "racecar\n", Output: "racecar", IsSample: false},
@@ -423,15 +423,15 @@ func seedContests() {
 	now := time.Now()
 	contests := []models.Contest{
 		{
-			Title: "GOOJ 春季周赛", StartAt: now.Add(-2 * time.Hour), EndAt: now.Add(3 * time.Hour),
+			Title: "ark-OJ 春季行动", StartAt: now.Add(-2 * time.Hour), EndAt: now.Add(3 * time.Hour),
 			Status: "Running", ProblemIDs: "1001,1002,1003,1004,1005",
 		},
 		{
-			Title: "GOOJ 算法入门赛", StartAt: now.Add(24 * time.Hour), EndAt: now.Add(48 * time.Hour),
+			Title: "ark-OJ 新手作战", StartAt: now.Add(24 * time.Hour), EndAt: now.Add(48 * time.Hour),
 			Status: "Upcoming", ProblemIDs: "1006,1007,1008,1009,1010",
 		},
 		{
-			Title: "GOOJ 动态规划专题", StartAt: now.Add(-48 * time.Hour), EndAt: now.Add(-24 * time.Hour),
+			Title: "ark-OJ 动态规划合约", StartAt: now.Add(-48 * time.Hour), EndAt: now.Add(-24 * time.Hour),
 			Status: "Ended", ProblemIDs: "1012,1005,1028",
 		},
 	}

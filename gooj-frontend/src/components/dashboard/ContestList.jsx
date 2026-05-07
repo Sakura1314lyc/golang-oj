@@ -10,13 +10,13 @@ export default function ContestList({ contests }) {
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
           <div className="ark-kicker">Operations</div>
-          <h2 className="mt-1 text-base font-black">比赛列表</h2>
+          <h2 className="mt-1 text-base font-black">行动合约</h2>
         </div>
         <span className="ark-tag px-2.5 py-1">CONTEST</span>
       </div>
       <div className="space-y-2">
         {contests.slice(0, 3).map((c) => (
-          <div key={c.id} className="border border-white/10 bg-white/[0.045] p-3.5">
+          <div key={c.id} className="ark-card-cut border border-white/10 bg-white/[0.045] p-3.5">
             <div className="flex items-center justify-between gap-2">
               <div className="truncate text-sm font-bold">{c.title}</div>
               <span className={`ark-tag px-2.5 py-1 ${statusStyle[c.status] || statusStyle.Ended}`}>

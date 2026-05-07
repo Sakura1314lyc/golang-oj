@@ -154,11 +154,17 @@ func (h *AuthHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(updates) > 0 {
-		database.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates)
+		if err := database.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
+			writeError(w, http.StatusInternalServerError, "更新资料失败")
+			return
+		}
 	}
 
 	var user models.User
-	database.DB.First(&user, userID)
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		writeError(w, http.StatusNotFound, "用户不存在")
+		return
+	}
 	writeJSON(w, http.StatusOK, &user)
 }
 
@@ -186,8 +192,15 @@ func (h *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
-	database.DB.Model(&user).Update("password", string(hashed))
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "密码加密失败")
+		return
+	}
+	if err := database.DB.Model(&user).Update("password", string(hashed)).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, "密码修改失败")
+		return
+	}
 	writeMsg(w, http.StatusOK, "密码修改成功")
 }
 

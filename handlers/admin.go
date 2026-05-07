@@ -45,7 +45,9 @@ func (h *AdminHandler) ProblemStats(w http.ResponseWriter, r *http.Request) {
 		defer rows.Close()
 		for rows.Next() {
 			var s problemStat
-			rows.Scan(&s.ProblemID, &s.ProblemTitle, &s.TotalSubs, &s.AcceptedSubs)
+			if err := rows.Scan(&s.ProblemID, &s.ProblemTitle, &s.TotalSubs, &s.AcceptedSubs); err != nil {
+				continue
+			}
 			if s.TotalSubs > 0 {
 				rate := float64(s.AcceptedSubs) / float64(s.TotalSubs) * 100
 				s.AcceptRate = strconv.FormatFloat(rate, 'f', 1, 64) + "%"

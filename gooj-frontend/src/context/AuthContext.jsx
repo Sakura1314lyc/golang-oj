@@ -2,17 +2,22 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { api, setToken as saveToken } from '../api/client'
 
 const AuthContext = createContext(null)
+const TOKEN_KEY = 'ark_oj_token'
+
+function readStoredToken() {
+  return localStorage.getItem(TOKEN_KEY)
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('gooj_token')
+    const token = readStoredToken()
     if (token) {
       api.getProfile()
         .then(setUser)
-        .catch(() => { localStorage.removeItem('gooj_token'); setUser(null) })
+        .catch(() => { saveToken(null); setUser(null) })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)

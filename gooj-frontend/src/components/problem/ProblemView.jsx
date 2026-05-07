@@ -62,12 +62,13 @@ export default function ProblemView({
     } catch {
       // Fallback problem content remains visible if the API is offline.
     }
-    // Load past submissions for current problem
     if (user) {
       try {
         const subRes = await api.getSubmissions({ problem_id: problem.id, page_size: 10 })
         setPastSubs(subRes.data || [])
-      } catch { /* ignore */ }
+      } catch {
+        setPastSubs([])
+      }
     }
     setLoading(false)
   }, [problem, user])
@@ -146,13 +147,16 @@ export default function ProblemView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="ark-panel min-h-[260px] overflow-hidden p-6">
-        <div className="absolute inset-0 bg-[url('/assets/arkoj-ops-card.png')] bg-cover bg-center opacity-78" />
+      <div className="ark-panel min-h-[270px] overflow-hidden p-6">
+        <div className="absolute inset-0 bg-[url('/assets/ark-oj-ops-card.png')] bg-cover bg-center opacity-78" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#101419]/98 via-[#101419]/86 to-[#101419]/44" />
         <div className="ark-alert-tape absolute bottom-0 left-0 h-2 w-full" />
+        <div className="absolute right-4 top-4 border border-white/15 bg-black/35 px-2 py-1 text-[10px] font-black text-white/34">
+          DOC-{problem?.id || '----'}
+        </div>
         <div className="relative flex items-start justify-between gap-4 max-sm:flex-col">
           <div className="min-w-0 flex-1">
-            <div className="ark-kicker">Problem Archive / ArkOJ</div>
+            <div className="ark-kicker">Problem Archive / ark-OJ</div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <h2 className="text-3xl font-black tracking-tight max-sm:text-2xl">{detail?.title || problem?.title}</h2>
               <span className="ark-tag px-2.5 py-1">#{problem?.id}</span>
@@ -163,13 +167,13 @@ export default function ProblemView({
             {(detail?.input_desc || detail?.output_desc) && (
               <div className="mt-4 grid max-w-4xl grid-cols-2 gap-4 max-md:grid-cols-1">
                 {detail?.input_desc && (
-                  <div className="border-l-4 border-[var(--ark-cyan)] bg-black/28 p-3">
+                  <div className="ark-card-cut border-l-4 border-[var(--ark-cyan)] bg-black/28 p-3">
                     <span className="ark-kicker">INPUT</span>
                     <p className="mt-1 text-sm text-white/70">{detail.input_desc}</p>
                   </div>
                 )}
                 {detail?.output_desc && (
-                  <div className="border-l-4 border-[var(--ark-red)] bg-black/28 p-3">
+                  <div className="ark-card-cut border-l-4 border-[var(--ark-red)] bg-black/28 p-3">
                     <span className="ark-kicker">OUTPUT</span>
                     <p className="mt-1 text-sm text-white/70">{detail.output_desc}</p>
                   </div>
@@ -210,7 +214,7 @@ export default function ProblemView({
 
         <div className="space-y-3 max-lg:order-first">
           <div className="ark-image-panel relative hidden min-h-[230px] overflow-hidden lg:block">
-            <img src="/assets/arkoj-operator.png" alt="ArkOJ operator portrait" className="absolute inset-0 h-full w-full object-cover object-[center_18%]" />
+            <img src="/assets/ark-oj-operator.png" alt="ark-OJ operator portrait" className="absolute inset-0 h-full w-full object-cover object-[center_18%]" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/96 via-black/30 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="ark-kicker">Judge Operator</div>
@@ -256,20 +260,20 @@ export default function ProblemView({
               <span className="text-sm font-black">历史提交</span>
               <span className="ark-tag px-2 py-0.5 text-[10px]">{pastSubs.length}</span>
             </div>
-            <span className={`text-xs text-white/40 transition ${showPastSubs ? 'rotate-180' : ''}`}>▼</span>
+            <span className={`text-xs text-white/40 transition ${showPastSubs ? 'rotate-180' : ''}`}>v</span>
           </button>
           {showPastSubs && (
             <div className="border-t border-white/10">
               {pastSubs.map((sub) => (
                 <div
                   key={sub.id}
-                  className="flex items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm transition last:border-0 hover:bg-white/[0.03]"
+                  className="flex items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm transition last:border-0 hover:bg-white/[0.03] max-md:flex-wrap"
                 >
-                  <span className="text-xs text-white/35 w-12">#{sub.id}</span>
-                  <span className={`ark-tag px-2 py-0.5 text-[10px] flex-1 ${getStatusStyle(sub.status)}`}>
+                  <span className="w-12 text-xs text-white/35">#{sub.id}</span>
+                  <span className={`ark-tag flex-1 px-2 py-0.5 text-[10px] ${getStatusStyle(sub.status)}`}>
                     {sub.status}
                   </span>
-                  <span className="text-xs text-white/40 uppercase">{sub.language}</span>
+                  <span className="text-xs uppercase text-white/40">{sub.language}</span>
                   <span className="text-xs text-white/40">{sub.runtime || '--'}</span>
                   <span className="text-xs text-white/30">
                     {sub.created_at ? new Date(sub.created_at).toLocaleString() : ''}
@@ -290,7 +294,7 @@ function StatusDot({ status }) {
   const s = String(status || '').toLowerCase()
   let color = 'bg-gray-400'
   if (s.includes('accept')) color = 'bg-emerald-400'
-  else if (s.includes('pending') || s.includes('judging')) color = 'bg-[var(--ark-cyan)] animate-pulse'
+  else if (s.includes('pending') || s.includes('judging')) color = 'animate-pulse bg-[var(--ark-cyan)]'
   else if (s.includes('wrong') || s.includes('time') || s.includes('runtime')) color = 'bg-[var(--ark-red)]'
   else if (s.includes('compile')) color = 'bg-[var(--ark-amber)]'
   return <span className={`inline-block h-2.5 w-2.5 ${color}`} />

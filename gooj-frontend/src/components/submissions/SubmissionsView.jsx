@@ -105,9 +105,9 @@ export default function SubmissionsView({ onBack }) {
           <button
             key={f.value}
             onClick={() => { setStatusFilter(f.value); setPage(1) }}
-            className={`ark-tag px-3 py-1.5 text-xs font-black transition cursor-pointer ${
+            className={`ark-tag cursor-pointer px-3 py-1.5 text-xs font-black transition ${
               statusFilter === f.value
-                ? 'border-[var(--ark-red)] text-[var(--ark-red)] bg-red-500/10'
+                ? 'border-[var(--ark-red)] bg-red-500/10 text-[var(--ark-red)]'
                 : 'text-white/60 hover:text-white'
             }`}
           >
@@ -119,7 +119,7 @@ export default function SubmissionsView({ onBack }) {
       {loading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="ark-panel-soft animate-pulse flex items-center gap-4 p-4">
+            <div key={i} className="ark-panel-soft flex animate-pulse items-center gap-4 p-4">
               <div className="h-4 w-16 bg-white/10" />
               <div className="h-4 flex-1 bg-white/10" />
               <div className="h-4 w-20 bg-white/10" />
@@ -136,7 +136,7 @@ export default function SubmissionsView({ onBack }) {
           {submissions.map((sub) => (
             <div
               key={sub.id}
-              className="ark-panel-soft flex items-center gap-4 px-4 py-3 transition hover:bg-white/[0.04]"
+              className="ark-panel-soft flex items-center gap-4 px-4 py-3 transition hover:bg-white/[0.04] max-md:flex-wrap"
             >
               <span className="w-16 text-xs font-bold text-white/40">#{sub.id}</span>
               <div className="min-w-0 flex-1">
@@ -144,7 +144,7 @@ export default function SubmissionsView({ onBack }) {
                   <span className="truncate text-sm font-bold">
                     #{sub.problem_id} {sub.problem_name}
                   </span>
-                  <span className="text-[10px] text-white/35 uppercase">{(sub.language || 'cpp')}</span>
+                  <span className="text-[10px] uppercase text-white/35">{(sub.language || 'cpp')}</span>
                 </div>
                 <div className="mt-1 text-xs text-white/35">
                   {sub.created_at ? new Date(sub.created_at).toLocaleString() : '--'}
@@ -177,7 +177,7 @@ export default function SubmissionsView({ onBack }) {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`ark-tag px-2.5 py-1 text-xs font-black cursor-pointer ${
+                  className={`ark-tag cursor-pointer px-2.5 py-1 text-xs font-black ${
                     page === p ? 'border-[var(--ark-red)] text-[var(--ark-red)]' : 'text-white/50'
                   }`}
                 >

@@ -3,15 +3,17 @@
 :root {
   color-scheme: dark;
   font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
-  --ark-bg: #0b0d10;
-  --ark-panel: rgba(18, 22, 27, 0.86);
+  --ark-bg: #080a0d;
+  --ark-panel: rgba(17, 20, 24, 0.9);
   --ark-line: rgba(236, 240, 244, 0.14);
   --ark-line-strong: rgba(236, 240, 244, 0.24);
   --ark-text: #f2f4f6;
-  --ark-red: #e34545;
+  --ark-red: #e43d3d;
   --ark-cyan: #5ad7ff;
   --ark-amber: #d6a23f;
   --ark-white: #f3f4f5;
+  --ark-dark: #111418;
+  --ark-ink: #050608;
 }
 
 body {
@@ -47,10 +49,10 @@ button:disabled {
   overflow-x: hidden;
   color: var(--ark-text);
   background:
-    linear-gradient(115deg, rgba(227, 69, 69, 0.15), transparent 22%),
-    linear-gradient(245deg, rgba(90, 215, 255, 0.1), transparent 28%),
-    radial-gradient(circle at 18% 12%, rgba(214, 162, 63, 0.12), transparent 28%),
-    #0b0d10;
+    linear-gradient(115deg, rgba(228, 61, 61, 0.17), transparent 20%),
+    linear-gradient(245deg, rgba(90, 215, 255, 0.1), transparent 27%),
+    radial-gradient(circle at 20% 8%, rgba(214, 162, 63, 0.11), transparent 24%),
+    linear-gradient(180deg, #11151a 0%, #080a0d 42%, #050608 100%);
 }
 
 .ark-shell::before {
@@ -59,10 +61,11 @@ button:disabled {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, black, transparent 82%);
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(120deg, transparent 0 58%, rgba(255, 255, 255, 0.045) 58% 58.4%, transparent 58.4%);
+  background-size: 44px 44px, 44px 44px, 210px 210px;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
 }
 
 .ark-shell::after {
@@ -81,6 +84,37 @@ button:disabled {
   mix-blend-mode: overlay;
 }
 
+.ark-shell-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ark-shell-grid::before,
+.ark-shell-grid::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: skewX(-16deg);
+}
+
+.ark-shell-grid::before {
+  right: -42px;
+  top: 88px;
+  height: 230px;
+  width: 360px;
+  border-left: 8px solid rgba(228, 61, 61, 0.36);
+}
+
+.ark-shell-grid::after {
+  left: -120px;
+  bottom: 170px;
+  height: 180px;
+  width: 300px;
+  border-right: 8px solid rgba(90, 215, 255, 0.26);
+}
+
 .ark-day {
   background:
     linear-gradient(115deg, rgba(227, 69, 69, 0.12), transparent 22%),
@@ -95,7 +129,7 @@ button:disabled {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%),
     var(--ark-panel);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.26);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(18px);
   clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 }
@@ -111,10 +145,21 @@ button:disabled {
   z-index: 2;
 }
 
+.ark-panel::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  pointer-events: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, 34% 0, 32% 1px, 0 1px);
+}
+
 .ark-panel-soft {
   border: 1px solid var(--ark-line);
-  background: rgba(18, 22, 27, 0.76);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 38%),
+    rgba(18, 22, 27, 0.8);
+  box-shadow: 0 13px 32px rgba(0, 0, 0, 0.26);
   backdrop-filter: blur(14px);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
 }
@@ -154,6 +199,12 @@ button:disabled {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
 }
 
+.ark-button-danger {
+  border: 1px solid rgba(228, 61, 61, 0.5);
+  background: rgba(228, 61, 61, 0.12);
+  color: #ffb8b8;
+}
+
 .ark-button-primary:hover {
   background: linear-gradient(135deg, #ffffff, #e6edf2);
   transform: translateY(-1px);
@@ -163,7 +214,7 @@ button:disabled {
   color: var(--ark-cyan);
   font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -185,10 +236,11 @@ button:disabled {
   height: 52px;
   width: 52px;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
     rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 -4px 0 rgba(228, 61, 61, 0.75), 0 10px 24px rgba(0, 0, 0, 0.26);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
 }
 
@@ -202,11 +254,25 @@ button:disabled {
   background: var(--ark-red);
 }
 
+.ark-logo-mark::after {
+  content: "";
+  position: absolute;
+  inset: 12px 13px 10px;
+  border-left: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+  transform: skewX(-16deg);
+  opacity: 0.45;
+}
+
 .ark-image-panel {
   overflow: hidden;
   border: 1px solid var(--ark-line);
   background: #090b0e;
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.ark-card-cut {
+  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
 }
 
 .ark-alert-tape {
@@ -217,6 +283,17 @@ button:disabled {
     #0b0d10 12px,
     #0b0d10 24px
   );
+}
+
+.ark-hazard-slab {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(228, 61, 61, 0.92) 0,
+      rgba(228, 61, 61, 0.92) 12px,
+      rgba(5, 6, 8, 0.95) 12px,
+      rgba(5, 6, 8, 0.95) 24px
+    );
 }
 
 .ark-corner-label {
@@ -245,9 +322,21 @@ button:disabled {
   letter-spacing: 0;
 }
 
+.ark-huge-code {
+  pointer-events: none;
+  font-weight: 1000;
+  line-height: 0.82;
+  color: rgba(255, 255, 255, 0.06);
+}
+
 .ark-terminal-rule {
   height: 1px;
   background: linear-gradient(90deg, var(--ark-red), rgba(255, 255, 255, 0.28), transparent);
+}
+
+.ark-terminal-rule-cyan {
+  height: 1px;
+  background: linear-gradient(90deg, var(--ark-cyan), rgba(255, 255, 255, 0.2), transparent);
 }
 
 .ark-image-grain::after {
@@ -293,6 +382,33 @@ button:disabled {
     transparent 8px,
     transparent 16px
   );
+}
+
+.ark-status-strip {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.ark-status-strip::before {
+  content: "";
+  height: 100%;
+  min-height: 34px;
+  background: var(--ark-red);
+}
+
+.ark-tactical-row {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.065), transparent 36%),
+    rgba(255, 255, 255, 0.035);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.ark-day .ark-watermark,
+.ark-day .ark-huge-code {
+  color: rgba(10, 16, 22, 0.08);
 }
 
 @keyframes slide-up {

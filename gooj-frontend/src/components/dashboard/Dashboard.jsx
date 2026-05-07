@@ -44,42 +44,43 @@ export default function Dashboard({
                 <div className="text-sm font-black">{a.title}</div>
                 {a.content && <p className="mt-1 text-xs text-white/60">{a.content}</p>}
               </div>
-              <button onClick={() => setShowAnn(false)} className="text-xs text-white/30 hover:text-white">✕</button>
+              <button onClick={() => setShowAnn(false)} className="text-xs text-white/35 hover:text-white">X</button>
             </div>
           ))}
         </div>
       )}
 
-      <section className="ark-panel ark-image-grain mb-5 min-h-[440px] overflow-hidden p-6 sm:p-9">
-        <div className="absolute inset-0 bg-[url('/assets/arkoj-hero.png')] bg-cover bg-[center_right_16%] opacity-100 max-sm:bg-[center_right_28%]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/98 via-black/80 to-black/16 max-sm:from-black/96 max-sm:via-black/80 max-sm:to-black/58" />
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/80 to-transparent" />
+      <section className="ark-panel ark-image-grain mb-5 min-h-[460px] overflow-hidden p-6 sm:p-9">
+        <div className="absolute inset-0 bg-[url('/assets/ark-oj-hero.png')] bg-cover bg-[center_right_16%] opacity-100 max-sm:bg-[center_right_28%]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/98 via-black/80 to-black/16 max-sm:from-black/96 max-sm:via-black/82 max-sm:to-black/60" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/84 to-transparent" />
         <div className="ark-alert-tape absolute bottom-0 left-0 h-3 w-full" />
-        <div className="absolute right-5 top-5 hidden border border-white/15 bg-black/30 px-3 py-2 text-xs font-black text-white/35 lg:block">
-          ARKOJ / 01
+        <div className="absolute right-5 top-5 hidden border border-white/15 bg-black/40 px-3 py-2 text-xs font-black text-white/35 lg:block">
+          ARK-OJ / 01
         </div>
-        <div className="ark-watermark absolute bottom-8 right-8 hidden text-[140px] leading-none lg:block">
+        <div className="ark-huge-code absolute bottom-6 right-8 hidden text-[150px] lg:block">
           01
         </div>
-        <div className="ark-watermark absolute -left-3 top-20 hidden -rotate-90 text-7xl leading-none xl:block">
-          ARKOJ
+        <div className="ark-watermark absolute -left-3 top-24 hidden -rotate-90 text-7xl leading-none xl:block">
+          ARK-OJ
         </div>
+        <div className="absolute left-7 top-7 h-10 w-1 bg-[var(--ark-red)]" />
         <div className="relative max-w-2xl max-sm:max-w-[315px]">
           <div className="ark-kicker">Operator Control Deck</div>
           <h2 className="mt-3 max-w-xl text-5xl font-black leading-tight tracking-tight max-md:text-4xl max-sm:text-3xl">
-            <span className="ark-title-slab">ArkOJ</span>
+            <span className="ark-title-slab">ark-OJ</span>
             <span className="mt-2 block text-3xl text-white/92 max-sm:text-2xl">算法作战终端</span>
           </h2>
-          <div className="ark-terminal-rule mt-5 w-56" />
+          <div className="ark-terminal-rule mt-5 w-64" />
           <p className="mt-5 max-w-xl text-sm leading-7 text-white/74">
-            以任务档案、战术看板和代码终端组织判题流程。选择题目，编写代码，提交判定，所有状态都像作战记录一样清晰展开。
+            用任务档案、战术看板和代码终端组织刷题流程。选择题目、编写代码、提交判定，所有状态都像作战记录一样清晰展开。
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <button
               onClick={() => onSelect(selected)}
               className="ark-corner-label px-5 py-3 text-sm font-black"
             >
-              进入当前题目
+              进入当前任务
             </button>
             <span className="ark-tag px-3 py-2">ACTIVE #{selected?.id || '--'}</span>
             <span className="ark-tag border-[var(--ark-red)]/50 px-3 py-2 text-[var(--ark-red)]">TACTICAL MODE</span>
@@ -103,9 +104,10 @@ export default function Dashboard({
 
         <div className="space-y-4 max-lg:order-1">
           <div className="ark-panel ark-image-grain overflow-hidden p-5">
-            <div className="absolute inset-0 bg-[url('/assets/arkoj-ops-card.png')] bg-cover bg-center opacity-42" />
+            <div className="absolute inset-0 bg-[url('/assets/ark-oj-ops-card.png')] bg-cover bg-center opacity-46" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#101419]/96 via-[#101419]/82 to-[#101419]/40" />
             <div className="absolute right-3 top-3 border border-white/15 px-2 py-1 text-[10px] font-black text-white/32">BR-01</div>
+            <div className="absolute bottom-0 right-0 h-12 w-28 bg-white/5 [clip-path:polygon(22%_0,100%_0,100%_100%,0_100%)]" />
             <div className="relative">
               <div className="ark-kicker">Briefing</div>
               <h2 className="mt-2 text-xl font-black leading-tight">当前任务</h2>
@@ -143,17 +145,23 @@ export default function Dashboard({
 
 function OperatorCard() {
   return (
-    <div className="ark-image-panel relative min-h-[320px]">
+    <div className="ark-image-panel ark-image-grain relative min-h-[360px]">
       <img
-        src="/assets/arkoj-operator.png"
-        alt="ArkOJ tactical operator"
-        className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
+        src="/assets/ark-oj-operator.png"
+        alt="ark-OJ tactical operator"
+        className="absolute inset-0 h-full w-full object-cover object-[center_12%]"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/18 to-black/16" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/94 via-black/20 to-black/10" />
       <div className="ark-alert-tape absolute left-0 top-0 h-full w-2" />
+      <div className="absolute right-3 top-3 border border-white/20 bg-black/35 px-2 py-1 text-[10px] font-black text-white/42">
+        OP-7
+      </div>
+      <div className="absolute left-4 top-4 border-l-4 border-[var(--ark-cyan)] bg-black/35 px-3 py-2 text-[10px] font-black uppercase text-white/42">
+        Rhodes Protocol
+      </div>
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <div className="ark-kicker">Operator File</div>
-        <div className="mt-1 text-lg font-black">系统分析员 / ArkOJ</div>
+        <div className="mt-1 text-lg font-black">系统分析员 / ark-OJ</div>
         <p className="mt-2 text-xs leading-5 text-white/62">
           负责题目调度、提交追踪与终端状态监控。
         </p>

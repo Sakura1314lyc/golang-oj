@@ -22,7 +22,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ success, error, info }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[100] flex max-w-[420px] flex-col gap-2">
+      <div className="fixed bottom-6 right-6 z-[100] flex max-w-[420px] flex-col gap-2 max-sm:left-4 max-sm:right-4 max-sm:bottom-4">
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -35,7 +35,7 @@ export function ToastProvider({ children }) {
             }`}
           >
             <span className="mr-2 text-xs uppercase tracking-wider text-white/50">
-              {t.type === 'success' ? '✓ OK' : t.type === 'error' ? '✗ ERR' : 'ℹ INFO'}
+              {t.type === 'success' ? 'OK' : t.type === 'error' ? 'ERR' : 'INFO'}
             </span>
             {t.message}
           </div>

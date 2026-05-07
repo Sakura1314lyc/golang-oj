@@ -13,6 +13,7 @@ export default function ProblemList({ problems, selected, onSelect, query, setQu
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [query, onSearch])
+
   const filtered = useMemo(() => {
     return problems.filter((p) => {
       const tags = Array.isArray(p.tags) ? p.tags.join(' ') : String(p.tags || '')
@@ -25,7 +26,7 @@ export default function ProblemList({ problems, selected, onSelect, query, setQu
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
           <div className="ark-kicker">Mission Archives</div>
-          <h2 className="mt-1 text-base font-black">题目列表</h2>
+          <h2 className="mt-1 text-base font-black">题目档案</h2>
         </div>
         <span className="ark-tag px-2.5 py-1">{problems.length}</span>
       </div>
@@ -41,7 +42,7 @@ export default function ProblemList({ problems, selected, onSelect, query, setQu
           <button
             key={p.id}
             onClick={() => onSelect(p)}
-            className={`w-full border p-3 text-left transition ${
+            className={`ark-card-cut w-full border p-3 text-left transition ${
               selected?.id === p.id
                 ? 'border-[var(--ark-red)] bg-white/12 shadow-[inset_4px_0_0_var(--ark-red)]'
                 : 'border-white/10 bg-white/[0.045] hover:border-[var(--ark-cyan)]/60 hover:bg-white/10'

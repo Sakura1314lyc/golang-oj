@@ -1,12 +1,16 @@
 const API_BASE = 'http://localhost:8080/api'
+const TOKEN_KEY = 'ark_oj_token'
 
 function getToken() {
-  return localStorage.getItem('gooj_token')
+  return localStorage.getItem(TOKEN_KEY)
 }
 
 export function setToken(token) {
-  if (token) localStorage.setItem('gooj_token', token)
-  else localStorage.removeItem('gooj_token')
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token)
+  } else {
+    localStorage.removeItem(TOKEN_KEY)
+  }
 }
 
 export function getAuthHeaders() {
@@ -23,12 +27,10 @@ async function request(path, options = {}) {
   return data
 }
 
-// Unwrap paginated API responses: extract the inner data array
 function paginated(path, options = {}) {
   return request(path, options).then((res) => (res && res.data) || res)
 }
 
-// Like paginated but also returns pagination metadata {data, pagination}
 function paginatedWithMeta(path, options = {}) {
   return request(path, options).then((res) => {
     if (res && res.data && res.pagination) return res
@@ -38,7 +40,6 @@ function paginatedWithMeta(path, options = {}) {
 }
 
 export const api = {
-  // Auth
   register: (username, password) =>
     request('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) }),
 
@@ -49,7 +50,6 @@ export const api = {
   updateProfile: (data) =>
     request('/profile/update', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
 
-  // Problems (paginated)
   getProblems: (params = {}) => {
     const qs = new URLSearchParams()
     if (params.q) qs.set('q', params.q)
@@ -62,7 +62,6 @@ export const api = {
   },
   getProblem: (id) => request(`/problems/${id}`),
 
-  // Submissions
   submit: (problemId, language, code) =>
     request('/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problem_id: problemId, language, code }) }),
 
@@ -85,12 +84,7 @@ export const api = {
     return paginatedWithMeta(`/my/submissions${query ? '?' + query : ''}`)
   },
 
-  // Contests (returns plain array, no pagination wrapper)
   getContests: () => request('/contests'),
-
-  // Leaderboard (paginated)
   getLeaderboard: () => paginated('/leaderboard'),
-
-  // Announcements
   getAnnouncements: () => request('/announcements'),
 }

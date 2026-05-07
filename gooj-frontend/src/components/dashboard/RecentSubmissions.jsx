@@ -33,11 +33,11 @@ export default function RecentSubmissions({ submissions }) {
         {submissions.slice(0, 8).map((sub) => (
           <div
             key={sub.id}
-            className="flex items-center justify-between gap-2 border border-transparent px-3 py-2 transition hover:border-white/10 hover:bg-white/[0.055]"
+            className="ark-tactical-row flex items-center justify-between gap-2 px-3 py-2 transition hover:border-white/20 hover:bg-white/[0.07]"
           >
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-bold">{sub.problem_name || `#${sub.problem_id}`}</div>
-              <div className="flex gap-2 text-xs text-white/45">
+              <div className="flex flex-wrap gap-2 text-xs text-white/45">
                 <span>#{sub.id}</span>
                 <span className="uppercase">{sub.language || 'cpp'}</span>
                 <span>{sub.runtime || '--'}</span>

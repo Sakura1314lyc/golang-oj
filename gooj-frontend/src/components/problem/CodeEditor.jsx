@@ -26,7 +26,7 @@ const langLabels = {
 const darkTheme = EditorView.theme({
   '&': { color: '#f2f4f6', backgroundColor: '#090b0e' },
   '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.75', padding: '16px' },
-  '.cm-cursor': { borderLeftColor: '#e34545', borderLeftWidth: '2px' },
+  '.cm-cursor': { borderLeftColor: '#e43d3d', borderLeftWidth: '2px' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#263745' },
   '.cm-activeLine': { backgroundColor: '#141a20' },
   '.cm-gutters': { backgroundColor: '#101419', border: 'none', borderRight: '1px solid rgba(255,255,255,0.08)' },
@@ -41,7 +41,7 @@ const darkTheme = EditorView.theme({
 const lightTheme = EditorView.theme({
   '&': { color: '#17202a', backgroundColor: '#eef1f3' },
   '.cm-content': { fontFamily: "'Consolas', 'Monaco', 'Fira Code', monospace", fontSize: '14px', lineHeight: '1.75', padding: '16px' },
-  '.cm-cursor': { borderLeftColor: '#e34545', borderLeftWidth: '2px' },
+  '.cm-cursor': { borderLeftColor: '#e43d3d', borderLeftWidth: '2px' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: '#cbd7df' },
   '.cm-activeLine': { backgroundColor: '#e0e6ea' },
   '.cm-gutters': { backgroundColor: '#dce2e7', border: 'none', borderRight: '1px solid rgba(10,16,22,0.12)' },
@@ -88,7 +88,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
         </div>
         <span className="ark-tag px-3 py-1">EDITOR</span>
       </div>
-      <div className="code-shell overflow-hidden border border-white/14 shadow-2xl">
+      <div className="code-shell ark-card-cut overflow-hidden border border-white/14 shadow-2xl">
         <CodeMirror
           value={value}
           onChange={handleChange}

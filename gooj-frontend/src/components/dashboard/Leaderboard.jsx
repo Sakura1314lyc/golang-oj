@@ -12,10 +12,10 @@ export default function Leaderboard({ users }) {
         {users.map((u) => (
           <div
             key={u.username}
-            className="flex items-center justify-between gap-2 border border-transparent px-3 py-2.5 transition hover:border-white/10 hover:bg-white/[0.055]"
+            className="ark-tactical-row flex items-center justify-between gap-2 px-3 py-2.5 transition hover:border-white/20 hover:bg-white/[0.07]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className={`flex h-7 w-7 shrink-0 items-center justify-center text-xs font-black ${
+              <span className={`grid h-7 w-7 shrink-0 place-items-center text-xs font-black ${
                 u.rank <= 3
                   ? 'bg-[var(--ark-red)] text-white'
                   : 'border border-white/15 bg-white/5 text-white/65'
@@ -24,7 +24,7 @@ export default function Leaderboard({ users }) {
               </span>
               <div className="min-w-0">
                 <div className="truncate text-sm font-bold">{u.username}</div>
-                <div className="text-xs text-white/45">{u.solved_count} solved · {u.accepted_count || 0} AC</div>
+                <div className="text-xs text-white/45">{u.solved_count} solved / {u.accepted_count || 0} AC</div>
               </div>
             </div>
             <div className="shrink-0 text-sm font-black text-[var(--ark-cyan)]">{u.score || u.rating}</div>

@@ -14,7 +14,7 @@ const fallbackProblems = [
     id: 1001,
     title: 'A + B Problem',
     description: '输入两个整数，输出它们的和。',
-    tags: ['math'],
+    tags: ['math', 'starter'],
     difficulty: 'Easy',
     time_limit_ms: 1000,
     memory_limit_mb: 128,
@@ -23,7 +23,7 @@ const fallbackProblems = [
     id: 1002,
     title: 'Reverse String',
     description: '输入一个字符串，输出反转后的结果。',
-    tags: ['string'],
+    tags: ['string', 'starter'],
     difficulty: 'Easy',
     time_limit_ms: 1000,
     memory_limit_mb: 128,
@@ -40,9 +40,12 @@ const defaultCodes = {
 
 function AppFooter() {
   return (
-    <footer className="mt-10 border-t border-white/8 pb-6 pt-6 text-center text-xs text-white/25">
-      <span className="font-bold">ArkOJ</span> Tactical Judge Terminal &mdash;
-      <span className="ml-1">基于 Go + React 构建 · v1.0</span>
+    <footer className="mt-10 border-t border-white/8 pb-6 pt-6 text-center text-xs text-white/28">
+      <span className="font-bold text-white/55">ark-OJ</span>
+      <span className="mx-2 text-white/18">/</span>
+      <span>Tactical Judge Terminal</span>
+      <span className="mx-2 text-white/18">/</span>
+      <span>Go + React v1.0</span>
     </footer>
   )
 }
@@ -53,7 +56,7 @@ function ProblemLoader() {
       <div className="ark-panel px-10 py-8 text-center">
         <div className="mx-auto h-9 w-9 animate-spin border-2 border-white/20 border-t-[var(--ark-red)]" />
         <div className="mt-4 ark-kicker">Loading Editor</div>
-        <p className="mt-1 text-sm text-white/55">正在调度代码终端...</p>
+        <p className="mt-1 text-sm text-white/55">正在接入代码终端...</p>
       </div>
     </div>
   )
@@ -84,8 +87,6 @@ function AppContent() {
         if (!search) {
           setSelected((prev) => data.find((p) => p.id === prev?.id) || data[0])
         }
-      } else if (Array.isArray(data) && data.length === 0 && !search) {
-        // keep fallback data when API returns empty on first load
       }
     } catch {
       // Use bundled fallback data when the API is unavailable.
@@ -156,6 +157,7 @@ function AppContent() {
 
   return (
     <div className={`ark-shell ${dark ? '' : 'ark-day'}`}>
+      <div className="ark-shell-grid" />
       <div className="relative z-10 mx-auto max-w-[1440px] px-5 py-5 max-sm:px-3">
         <Header dark={dark} setDark={setDark} view={view} setView={setView} onRefresh={loadAll} />
 

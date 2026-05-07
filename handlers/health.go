@@ -14,7 +14,7 @@ func NewHealthHandler() *HealthHandler {
 func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
 		"ok":      true,
-		"service": "GOOJ",
+		"service": "ark-OJ",
 		"time":    time.Now().Format(time.RFC3339),
 	})
 }
